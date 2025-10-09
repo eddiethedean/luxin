@@ -6,13 +6,22 @@
     const detailData = {detail_data};
     const groupbyCols = {groupby_cols};
     
+    // Use unique ID to target this specific instance
+    const uniqueId = '{unique_id}';
+    
     // Get DOM elements
-    const detailPanel = document.getElementById('detail-panel');
-    const detailContent = document.getElementById('detail-content');
-    const closeButton = document.getElementById('close-panel');
+    const detailPanel = document.getElementById('detail-panel-' + uniqueId);
+    const detailContent = document.getElementById('detail-content-' + uniqueId);
+    const closeButton = document.getElementById('close-panel-' + uniqueId);
+    const mainTable = document.getElementById('main-table-' + uniqueId);
+    
+    if (!detailPanel || !detailContent || !closeButton || !mainTable) {
+        console.error('Luxin: Could not find required DOM elements for instance', uniqueId);
+        return;
+    }
     
     // Get all data rows (skip header)
-    const dataRows = document.querySelectorAll('.main-table-container tbody tr');
+    const dataRows = mainTable.querySelectorAll('tbody tr');
     
     // Add click handlers to rows
     dataRows.forEach((row, index) => {
@@ -40,7 +49,7 @@
     document.addEventListener('click', function(event) {
         if (detailPanel.classList.contains('open') && 
             !detailPanel.contains(event.target) && 
-            !event.target.closest('.main-table-container tbody tr')) {
+            !mainTable.contains(event.target)) {
             closeDetailPanel();
         }
     });
@@ -56,7 +65,7 @@
     
     function showDetailPanel(rowKey) {
         if (!rowKey || !sourceMapping[rowKey]) {
-            detailContent.innerHTML = '<p class="detail-placeholder">No detail data available</p>';
+            detailContent.innerHTML = '<p class="detail-placeholder">No detail data available for this row</p>';
             detailPanel.classList.add('open');
             return;
         }

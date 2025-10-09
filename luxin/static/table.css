@@ -7,12 +7,18 @@
     position: relative;
     width: 100%;
     max-width: 100%;
+    min-height: 400px;
+    overflow: visible;
 }
 
 .main-table-container {
     flex: 1;
     min-width: 0;
-    transition: margin-right 0.3s ease;
+    transition: margin-right 0.3s ease, width 0.3s ease;
+}
+
+.luxin-container:has(.detail-panel.open) .main-table-container {
+    margin-right: 620px;
 }
 
 .main-table-container h3 {
@@ -67,11 +73,12 @@
 }
 
 .detail-panel {
-    position: fixed;
+    position: absolute;
     right: -600px;
     top: 0;
     width: 600px;
-    height: 100vh;
+    min-height: 100%;
+    max-height: 600px;
     background: white;
     border-left: 1px solid #ddd;
     box-shadow: -2px 0 8px rgba(0,0,0,0.1);

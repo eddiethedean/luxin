@@ -88,6 +88,12 @@ def render_html(
     Returns:
         Complete HTML string for the interactive table
     """
+    import random
+    import string
+    
+    # Generate unique ID for this table instance
+    unique_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    
     # Load templates
     template_path = os.path.join(os.path.dirname(__file__), 'templates', 'table.html')
     css_path = os.path.join(os.path.dirname(__file__), 'static', 'table.css')
@@ -133,11 +139,16 @@ def render_html(
         '{groupby_cols}',
         json.dumps(groupby_cols)
     )
+    javascript = javascript.replace(
+        '{unique_id}',
+        unique_id
+    )
     
     # Assemble final HTML
     html = template.replace('{css}', css)
     html = html.replace('{agg_table}', agg_table_html)
     html = html.replace('{javascript}', javascript)
+    html = html.replace('{unique_id}', unique_id)
     
     return html
 
