@@ -13,11 +13,14 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 * 🔍 **Interactive drill-down** - Click on aggregated rows to see source data instantly
 * 📊 **Streamlit-native UI** - Fully integrated with Streamlit's native widgets
 * 🐼 **Pandas support** - Works seamlessly with pandas DataFrames
+* 🦀 **Polars support** - Optional support for Polars DataFrames
 * 🎯 **Automatic tracking** - TrackedDataFrame automatically tracks source rows during aggregations
 * 📓 **Jupyter support** - Also works in Jupyter notebooks (legacy HTML backend)
 * 🚀 **Zero-config** - Get started with minimal setup
 * 🎨 **Modern UI** - Clean, responsive interface with side-by-side detail view
 * 📈 **Multi-column grouping** - Support for complex multi-level aggregations
+* 🔧 **Configurable** - Customize UI behavior with InspectorConfig
+* ✅ **Well-tested** - 85%+ test coverage with comprehensive test suite
 
 ## 📦 Installation
 
@@ -146,6 +149,20 @@ streamlit run examples/basic_usage.py
 streamlit run examples/sales_analysis.py
 ```
 
+## 📚 Documentation
+
+Comprehensive documentation is available:
+
+- [Getting Started](docs/getting-started.md) - Installation and basic usage
+- [User Guide](docs/user-guide.md) - Comprehensive usage documentation
+- [API Reference](docs/api-reference.md) - Complete API documentation
+- [Examples](docs/examples.md) - Code examples and tutorials
+- [Roadmap](docs/roadmap.md) - Future features and development plans
+- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
+- [Migration Guide](docs/migration.md) - Migrating from v0.1.0 to v0.2.0+
+
+Full documentation: https://luxin.readthedocs.io/
+
 ## 🛠️ Development
 
 ```bash
@@ -156,7 +173,20 @@ pip install -e ".[dev]"
 
 # Run tests
 pytest tests/
+
+# Run tests with coverage
+pytest tests/ --cov=luxin --cov-report=html
 ```
+
+### Test Coverage
+
+Luxin maintains **85%+ test coverage** with comprehensive tests for:
+- Core Inspector functionality
+- UI components (table view, detail panel, filters, export)
+- Data validation and error handling
+- Polars integration
+- Configuration management
+- Integration workflows
 
 ## 🤝 Contributing
 
@@ -172,10 +202,21 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## 🗺️ Roadmap
+
+Check out our [Roadmap](docs/roadmap.md) to see what's coming next! Planned features include:
+
+- **v0.3.0**: Enhanced visualizations, advanced filtering, performance optimizations
+- **v0.4.0**: SQL database integration, cloud storage support
+- **v0.5.0**: Multi-level drill-down, comparison mode, data quality indicators
+- **v0.6.0**: Collaboration tools, sharing, annotations
+- **v1.0.0**: Enterprise features, authentication, audit logging
+
 ## 🔗 Links
 
 * **🐙 GitHub Repository**: https://github.com/eddiethedean/luxin
 * **📦 PyPI Package**: https://pypi.org/project/luxin/
+* **📚 Documentation**: https://luxin.readthedocs.io/
 * **🐛 Issues**: https://github.com/eddiethedean/luxin/issues
 
 ---
