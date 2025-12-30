@@ -4,16 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "luxin"
-version = "0.1.0"
-description = "Interactive HTML tables with drill-down capabilities for exploring aggregated data"
+version = "0.2.0"
+description = "Streamlit-first interactive data exploration with drill-down capabilities for exploring aggregated data"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "pandas>=1.3.0",
+    "streamlit>=1.0.0",
     "ipython>=7.0.0",
 ]
 license = {text = "MIT"}
-keywords = ["dataframe", "visualization", "jupyter", "streamlit", "interactive", "drill-down"]
+keywords = ["dataframe", "visualization", "streamlit", "jupyter", "interactive", "drill-down", "data-exploration"]
 authors = [
     {name = "Odos Matthews", email = "odosmatthews@gmail.com"}
 ]
@@ -29,12 +30,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Streamlit",
     "Framework :: Jupyter",
 ]
 
 [project.optional-dependencies]
 polars = ["polars>=0.20.0"]
-streamlit = ["streamlit>=1.0.0"]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",

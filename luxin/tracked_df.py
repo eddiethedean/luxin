@@ -36,15 +36,27 @@ class TrackedDataFrame(pd.DataFrame):
         return TrackedGroupBy(self, by, **kwargs)
     
     def show_drill_table(self):
-        """Display the interactive drill-down table."""
+        """
+        Display the interactive drill-down table.
+        
+        .. deprecated:: 0.2.0
+            Use Inspector(df).render() instead. This method will be removed in a future version.
+        """
         if not self._is_aggregated:
             raise ValueError(
                 "show_drill_table() can only be called on aggregated DataFrames. "
-                "Use groupby().agg() first, or use create_drill_table() for manual setup."
+                "Use groupby().agg() first, or use Inspector(df).render() for the new API."
             )
         
-        from luxin.display import display_drill_table
-        display_drill_table(self, self._source_df, self._source_mapping, self._groupby_cols)
+        # Use Inspector for rendering (new approach)
+        try:
+            from luxin.inspector import Inspector
+            inspector = Inspector(self)
+            inspector.render()
+        except ImportError:
+            # Fallback to old display method if Inspector not available
+            from luxin.display import display_drill_table
+            display_drill_table(self, self._source_df, self._source_mapping, self._groupby_cols)
 
 
 class TrackedGroupBy:
@@ -70,20 +82,24 @@ class TrackedGroupBy:
         tracked_result._groupby_cols = self.by
         tracked_result._source_df = pd.DataFrame(self.tracked_df)
         
-        # Build the source mapping
+        # Build the source mapping (optimized for large datasets)
         source_mapping = {}
         
         # Get the groups and their indices
-        for group_key, group_indices in self.groupby_obj.groups.items():
+        # Use groups.items() which is more efficient than iterating separately
+        groups = self.groupby_obj.groups
+        for group_key, group_indices in groups.items():
             # Convert group_key to a tuple if it's not already
             if not isinstance(group_key, tuple):
                 group_key = (group_key,)
             
             # Store the mapping using the group key
-            # The result index will match the group keys
-            source_mapping[group_key] = list(group_indices)
+            # Convert to list only once for efficiency
+            source_mapping[group_key] = list(group_indices) if isinstance(group_indices, (list, tuple)) else list(group_indices)
         
-        tracked_result._source_mapping = source_mapping
+        # Optimize source mapping for performance
+        from luxin.utils import optimize_source_mapping
+        tracked_result._source_mapping = optimize_source_mapping(source_mapping)
         
         return tracked_result
     

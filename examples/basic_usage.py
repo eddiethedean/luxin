@@ -1,18 +1,18 @@
 """
 Basic usage example for Luxin.
 
-This example demonstrates both the automatic tracking (TrackedDataFrame)
-and manual API (create_drill_table) approaches.
+This example demonstrates the new Inspector API for Streamlit-first
+interactive data exploration with drill-down capabilities.
 """
 
 import pandas as pd
-from luxin import TrackedDataFrame, create_drill_table
+import streamlit as st
+from luxin import Inspector, TrackedDataFrame
 
 
-def example_tracked_dataframe():
-    """Example using TrackedDataFrame for automatic tracking."""
-    print("Example 1: Using TrackedDataFrame (Automatic Tracking)")
-    print("=" * 60)
+def example_inspector():
+    """Example using Inspector API (recommended approach)."""
+    st.header("Example 1: Using Inspector API")
     
     # Create sample data
     data = {
@@ -24,8 +24,6 @@ def example_tracked_dataframe():
     
     # Create TrackedDataFrame
     df = TrackedDataFrame(data)
-    print("\nOriginal Data:")
-    print(df)
     
     # Aggregate - tracking happens automatically
     agg = df.groupby(['category']).agg({
@@ -33,21 +31,14 @@ def example_tracked_dataframe():
         'profit': 'sum'
     })
     
-    print("\nAggregated Data:")
-    print(agg)
-    
-    # Display with drill-down (uncomment in Jupyter)
-    # agg.show_drill_table()
-    
-    print("\nSource mapping created:")
-    for key, indices in agg._source_mapping.items():
-        print(f"  {key}: {indices}")
+    # Use Inspector to render interactive view
+    inspector = Inspector(agg)
+    inspector.render()
 
 
-def example_manual_api():
-    """Example using manual API for existing DataFrames."""
-    print("\n\nExample 2: Using Manual API")
-    print("=" * 60)
+def example_regular_dataframe():
+    """Example using Inspector with regular pandas DataFrame."""
+    st.header("Example 2: Using Inspector with Regular DataFrame")
     
     # Your existing pandas workflow
     df = pd.DataFrame({
@@ -56,28 +47,23 @@ def example_manual_api():
         'expenses': [50, 60, 80, 90, 70, 55]
     })
     
-    print("\nOriginal Data:")
-    print(df)
+    # Convert to TrackedDataFrame for aggregation tracking
+    tracked_df = TrackedDataFrame(df)
     
     # Your existing aggregation
-    agg_df = df.groupby('region').agg({
+    agg_df = tracked_df.groupby('region').agg({
         'sales': 'sum',
         'expenses': 'sum'
     })
     
-    print("\nAggregated Data:")
-    print(agg_df)
-    
-    # Create drill-down table (uncomment in Jupyter)
-    # create_drill_table(agg_df, df, groupby_cols=['region'])
-    
-    print("\nYou can now use create_drill_table() in Jupyter to explore!")
+    # Use Inspector to render
+    inspector = Inspector(agg_df)
+    inspector.render()
 
 
 def example_multi_column_groupby():
     """Example with multiple groupby columns."""
-    print("\n\nExample 3: Multi-Column GroupBy")
-    print("=" * 60)
+    st.header("Example 3: Multi-Column GroupBy")
     
     data = {
         'region': ['North', 'North', 'North', 'South', 'South', 'South'],
@@ -87,8 +73,6 @@ def example_multi_column_groupby():
     }
     
     df = TrackedDataFrame(data)
-    print("\nOriginal Data:")
-    print(df)
     
     # Group by multiple columns
     agg = df.groupby(['region', 'product']).agg({
@@ -96,17 +80,18 @@ def example_multi_column_groupby():
         'units': 'sum'
     })
     
-    print("\nAggregated Data:")
-    print(agg)
-    
-    # Display (uncomment in Jupyter)
-    # agg.show_drill_table()
+    # Use Inspector to render
+    inspector = Inspector(agg)
+    inspector.render()
 
 
 if __name__ == '__main__':
-    example_tracked_dataframe()
-    example_manual_api()
-    example_multi_column_groupby()
+    st.set_page_config(page_title="Luxin Examples", page_icon="📊", layout="wide")
+    st.title("📊 Luxin Interactive Data Exploration Examples")
     
-    print("\n\nTo see the interactive drill-down tables, run these examples in a Jupyter notebook!")
+    example_inspector()
+    st.divider()
+    example_regular_dataframe()
+    st.divider()
+    example_multi_column_groupby()
 

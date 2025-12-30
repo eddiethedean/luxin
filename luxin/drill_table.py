@@ -4,14 +4,19 @@ Manual API for creating drill-down tables from existing DataFrames.
 
 import pandas as pd
 from typing import List, Dict, Any, Optional
+from luxin.validation import (
+    validate_dataframe, 
+    validate_groupby_cols, 
+    ValidationError
+)
 
 
 def create_drill_table(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
     groupby_cols: List[str],
-    **kwargs
-):
+    **kwargs: Any
+) -> None:
     """
     Create an interactive drill-down table from aggregated and detail DataFrames.
     
@@ -20,6 +25,9 @@ def create_drill_table(
         detail_df: The detail DataFrame containing source rows
         groupby_cols: List of column names used to group the data
         **kwargs: Additional options for display customization
+        
+    Raises:
+        ValueError: If inputs are invalid
         
     Example:
         >>> import pandas as pd
@@ -32,6 +40,14 @@ def create_drill_table(
         >>> agg_df = df.groupby('category').sum()
         >>> create_drill_table(agg_df, df, groupby_cols=['category'])
     """
+    # Validate inputs
+    try:
+        validate_dataframe(agg_df, "agg_df")
+        validate_dataframe(detail_df, "detail_df")
+        validate_groupby_cols(groupby_cols, detail_df)
+    except ValidationError as e:
+        raise ValueError(str(e)) from e
+    
     # Build the source mapping by matching groupby column values
     source_mapping = _build_source_mapping(agg_df, detail_df, groupby_cols)
     

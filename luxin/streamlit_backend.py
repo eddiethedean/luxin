@@ -14,32 +14,27 @@ def display_streamlit(
     **kwargs
 ):
     """
-    Display an interactive drill-down table in Streamlit.
+    Display an interactive drill-down table in Streamlit using native widgets.
+    
+    This function is now a wrapper that uses the new modular components.
+    For new code, use Inspector(df).render() instead.
     
     Args:
         agg_df: The aggregated DataFrame to display
         detail_df: The detail DataFrame containing source rows
         source_mapping: Dictionary mapping aggregated row keys to detail row indices
         groupby_cols: List of column names used to group the data
-        **kwargs: Additional options for display customization
+        **kwargs: Additional options for display customization (deprecated)
     """
     try:
         import streamlit as st
-        import streamlit.components.v1 as components
     except ImportError:
         raise ImportError(
             "Streamlit is required for Streamlit backend. "
-            "Install with: pip install luxin[streamlit]"
+            "Install with: pip install streamlit"
         )
     
-    from luxin.display import render_html
-    
-    # Render the HTML
-    html = render_html(agg_df, detail_df, source_mapping, groupby_cols)
-    
-    # Get height from kwargs or use default
-    height = kwargs.get('height', 600)
-    
-    # Display in Streamlit using components
-    components.html(html, height=height, scrolling=True)
+    # Use the new modular components
+    from luxin.components.table_view import render_table_view
+    render_table_view(agg_df, detail_df, source_mapping, groupby_cols)
 
