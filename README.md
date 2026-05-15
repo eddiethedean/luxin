@@ -202,6 +202,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## 📌 Current release
+
+**v0.2.1** — see [CHANGELOG.md](CHANGELOG.md) for fixes and dependency notes (notably **Streamlit >= 1.35** for interactive tables).
+
 ## 🗺️ Roadmap
 
 Check out our [Roadmap](docs/roadmap.md) to see what's coming next! Planned features include:

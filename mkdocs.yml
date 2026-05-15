@@ -4,7 +4,7 @@ site_url: https://luxin.readthedocs.io/
 
 repo_name: eddiethedean/luxin
 repo_url: https://github.com/eddiethedean/luxin
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 
 theme:
   name: material
@@ -55,6 +55,7 @@ nav:
   - Examples: examples.md
   - Troubleshooting: troubleshooting.md
   - Migration Guide: migration.md
+  - Changelog: changelog.md
   - Roadmap: roadmap.md
 
 plugins:

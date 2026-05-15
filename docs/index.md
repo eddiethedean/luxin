@@ -12,6 +12,9 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 - [User Guide](user-guide.md) - Comprehensive usage documentation
 - [API Reference](api-reference.md) - Complete API documentation
 - [Examples](examples.md) - Code examples and tutorials
+- [Troubleshooting](troubleshooting.md) - Common issues
+- [Migration Guide](migration.md) - Upgrading from older APIs
+- [Changelog](changelog.md) - Release history
 - [Roadmap](roadmap.md) - Future features and development plans
 
 ## Key Features

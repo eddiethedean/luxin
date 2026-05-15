@@ -13,7 +13,7 @@ dependencies = [
     "streamlit>=1.35.0",
     "ipython>=7.0.0",
 ]
-license = {text = "MIT"}
+license = "MIT"
 keywords = ["dataframe", "visualization", "streamlit", "jupyter", "interactive", "drill-down", "data-exploration"]
 authors = [
     {name = "Odos Matthews", email = "odosmatthews@gmail.com"}

@@ -176,6 +176,7 @@ Inspector(agg).render()
 ## Timeline
 
 - **v0.2.0**: New API introduced, old API deprecated with warnings
+- **v0.2.1**: Streamlit 1.35+ required for dataframe selection; normalized drill-down keys; clearer warnings for incomplete tracking; see [CHANGELOG.md](../CHANGELOG.md)
 - **v0.3.0** (planned): Old API removed, only Inspector API supported
 
 ## Need Help?

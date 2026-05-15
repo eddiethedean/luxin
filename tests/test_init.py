@@ -2,9 +2,16 @@
 Tests for luxin.__init__ module.
 """
 
+import re
+
 import pytest
 import warnings
-from luxin import Inspector, TrackedDataFrame, create_drill_table
+
+from luxin import Inspector, TrackedDataFrame, create_drill_table, __version__
+
+
+def test_version_pep440_three_part():
+    assert re.fullmatch(r"\d+\.\d+\.\d+", __version__) is not None
 
 
 def test_deprecated_show_drill_table_import():
