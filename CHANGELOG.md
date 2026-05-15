@@ -21,6 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Inspector(..., drill=...)` activates multi-level stacks only when `enable_multi_level_drill` is `True`; default behavior remains unchanged.
 - Aggregation builder overrides stash the rebuilt `TrackedDataFrame` under `luxin_agg_override_{session}` with an explicit Clear control.
 
+### Fixed
+
+- **Filters**: text search uses an index-aligned boolean mask so non-`RangeIndex` tables no longer error.
+- **Detail panel**: pagination uses stable `pagination_session_key` / content hash instead of `id(detail_rows)` so Streamlit reruns keep page state.
+- **Drill stack**: truncating the breadcrumb stack clears all matching `luxin_drill_last_push_*` session keys (not only a fixed depth range).
+- **Aggregation builder**: template mode no longer disagrees with the group-by multiselect; guard when no group-by candidates exist.
+- **Comparison** (`luxin.compare`): UI and docstrings clarify Welch t-tests use pooled columns, not row-pairing by join keys.
+- **CI**: GitHub Actions tests and lint also run on the **`master`** branch (default for this repo).
+
 ### Documentation
 
 - User guide, API reference, and `examples/phase3_multi_level.py` document Phase 3 workflows.

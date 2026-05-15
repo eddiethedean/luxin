@@ -154,13 +154,11 @@ class Inspector:
                 render_table_view,
             )
 
-            drill_active = (
+            if (
                 not override_active
                 and self.drill is not None
                 and self.config.enable_multi_level_drill
-            )
-
-            if drill_active:
+            ):
                 render_drill_stack_view(
                     cast(pd.DataFrame, effective_df), self.drill, config=self.config
                 )

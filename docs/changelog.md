@@ -9,7 +9,9 @@ The canonical copy for GitHub and releases also lives at the repository root as 
 
 ## [0.3.0] - 2026-05-15
 
-Phase 3 features (this release): multi-level drill (`DrillHierarchySpec` + breadcrumbs), data-quality dashboard, comparison views (`luxin.compare.inspect_pair`), aggregation builder expander, optional SciPy extra `luxin[compare]`, and new `InspectorConfig` flags. See root `CHANGELOG.md` for full notes.
+Phase 3 features (this release): multi-level drill (`DrillHierarchySpec` + breadcrumbs), data-quality dashboard, comparison views (`luxin.compare.inspect_pair`), aggregation builder expander, optional SciPy extra `luxin[compare]`, and new `InspectorConfig` flags.
+
+**Fixes in this release** include filter index alignment for text search, stable detail-panel pagination keys, drill-stack push-guard cleanup on truncate, aggregation-builder template/manual consistency, and comparison significance copy clarifying pooled t-tests. CI runs on `master` as well as `main` / `develop`. See root `CHANGELOG.md` for full notes.
 
 ## [0.2.1] - 2026-05-15
 

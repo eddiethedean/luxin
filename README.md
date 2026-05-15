@@ -204,6 +204,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+**Releasing a version:** ensure `pyproject.toml` and `luxin.__version__` match, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.3.0`). The tag must match the package version: the PyPI workflow checks this before publishing.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

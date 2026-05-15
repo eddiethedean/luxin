@@ -69,9 +69,7 @@ def build_diff_table(
         rser = rg[vc]
         parts[f"{vc}_left"] = lser
         parts[f"{vc}_right"] = rser
-        delta = rser.astype(float, copy=False).sub(
-            lser.astype(float, copy=False), fill_value=float("nan")
-        )
+        delta = rser.astype(float).sub(lser.astype(float), fill_value=float("nan"))
         parts[f"{vc}_delta"] = delta
         denom_ok = (lser != 0) & lser.notna()
         pct = pd.Series(float("nan"), index=lser.index)
