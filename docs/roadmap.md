@@ -572,5 +572,5 @@ We welcome feedback! Please open an issue on [GitHub](https://github.com/eddieth
 ---
 
 **Last Updated**: December 2024  
-**Version**: 0.2.0 → 1.0.0 Roadmap
+**Version**: 0.3.0 → 1.0.0 Roadmap
 
