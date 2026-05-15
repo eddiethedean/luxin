@@ -8,9 +8,9 @@ from luxin import Inspector, TrackedDataFrame
 
 def test_inspector_initialization():
     """Test Inspector initialization with regular DataFrame."""
-    df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+    df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
     inspector = Inspector(df)
-    
+
     assert inspector.df is df
     assert inspector._is_aggregated is False
     assert inspector._source_mapping == {}
@@ -20,48 +20,46 @@ def test_inspector_initialization():
 
 def test_inspector_with_tracked_dataframe():
     """Test Inspector initialization with non-aggregated TrackedDataFrame."""
-    df = TrackedDataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+    df = TrackedDataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
     inspector = Inspector(df)
-    
+
     assert inspector.df is df
     assert inspector._is_aggregated is False
 
 
 def test_inspector_with_aggregated_tracked_dataframe():
     """Test Inspector initialization with aggregated TrackedDataFrame."""
-    df = TrackedDataFrame({
-        'category': ['A', 'A', 'B', 'B'],
-        'value': [10, 20, 30, 40]
-    })
-    agg = df.groupby('category').agg({'value': 'sum'})
-    
+    df = TrackedDataFrame({"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40]})
+    agg = df.groupby("category").agg({"value": "sum"})
+
     inspector = Inspector(agg)
-    
+
     assert inspector._is_aggregated is True
     assert len(inspector._source_mapping) > 0
-    assert inspector._groupby_cols == ['category']
+    assert inspector._groupby_cols == ["category"]
     assert inspector._source_df is not None
 
 
 def test_inspector_render_without_streamlit():
     """Test that render handles Streamlit import."""
-    df = pd.DataFrame({'a': [1, 2, 3]})
+    df = pd.DataFrame({"a": [1, 2, 3]})
     inspector = Inspector(df)
-    
+
     # Since streamlit is imported at module level and inside render(),
     # we verify the function works when streamlit is available
     # The actual ImportError test would require more complex mocking
-    with patch('luxin.inspector.st') as mock_st:
+    with patch("luxin.inspector.st") as mock_st:
         mock_st.dataframe = MagicMock()
         mock_st.info = MagicMock()
         # Mock the import inside render() by patching streamlit module
         import sys
-        original_streamlit = sys.modules.get('streamlit')
+
+        original_streamlit = sys.modules.get("streamlit")
         mock_streamlit_module = MagicMock()
         mock_streamlit_module.dataframe = MagicMock()
         mock_streamlit_module.info = MagicMock()
-        sys.modules['streamlit'] = mock_streamlit_module
-        
+        sys.modules["streamlit"] = mock_streamlit_module
+
         try:
             inspector.render()
             # Function should work when streamlit is available
@@ -70,28 +68,29 @@ def test_inspector_render_without_streamlit():
         finally:
             # Restore original streamlit module
             if original_streamlit:
-                sys.modules['streamlit'] = original_streamlit
-            elif 'streamlit' in sys.modules:
-                del sys.modules['streamlit']
+                sys.modules["streamlit"] = original_streamlit
+            elif "streamlit" in sys.modules:
+                del sys.modules["streamlit"]
 
 
 def test_inspector_render_non_aggregated():
     """Test render method with non-aggregated DataFrame."""
-    df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+    df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
     inspector = Inspector(df)
-    
+
     # Patch streamlit at the module level where it's used
-    with patch('luxin.inspector.st') as mock_st:
+    with patch("luxin.inspector.st") as mock_st:
         mock_st.dataframe = MagicMock()
         mock_st.info = MagicMock()
         # Mock the import inside render() by patching sys.modules
         import sys
-        original_streamlit = sys.modules.get('streamlit')
+
+        original_streamlit = sys.modules.get("streamlit")
         mock_streamlit_module = MagicMock()
         mock_streamlit_module.dataframe = MagicMock()
         mock_streamlit_module.info = MagicMock()
-        sys.modules['streamlit'] = mock_streamlit_module
-        
+        sys.modules["streamlit"] = mock_streamlit_module
+
         try:
             inspector.render()
             # Should call st.dataframe (either from module or from import)
@@ -101,50 +100,48 @@ def test_inspector_render_non_aggregated():
         finally:
             # Restore original streamlit module
             if original_streamlit:
-                sys.modules['streamlit'] = original_streamlit
-            elif 'streamlit' in sys.modules:
-                del sys.modules['streamlit']
+                sys.modules["streamlit"] = original_streamlit
+            elif "streamlit" in sys.modules:
+                del sys.modules["streamlit"]
 
 
 def test_inspector_render_aggregated():
     """Test render method with aggregated TrackedDataFrame."""
-    df = TrackedDataFrame({
-        'category': ['A', 'A', 'B', 'B'],
-        'value': [10, 20, 30, 40]
-    })
-    agg = df.groupby('category').agg({'value': 'sum'})
+    df = TrackedDataFrame({"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40]})
+    agg = df.groupby("category").agg({"value": "sum"})
     inspector = Inspector(agg)
-    
-    with patch('luxin.components.table_view.render_table_view') as mock_render:
-        with patch('luxin.inspector.st'):
+
+    with patch("luxin.components.table_view.render_table_view") as mock_render:
+        with patch("luxin.inspector.st"):
             inspector.render()
-            
+
             # Should call render_table_view
             mock_render.assert_called_once()
             call_args = mock_render.call_args
-            assert call_args[1]['agg_df'] is agg
-            assert call_args[1]['detail_df'] is inspector._source_df
-            assert call_args[1]['source_mapping'] == inspector._source_mapping
-            assert call_args[1]['groupby_cols'] == inspector._groupby_cols
+            assert call_args[1]["agg_df"] is agg
+            assert call_args[1]["detail_df"] is inspector._source_df
+            assert call_args[1]["source_mapping"] == inspector._source_mapping
+            assert call_args[1]["groupby_cols"] == inspector._groupby_cols
 
 
 def test_inspector_render_empty_dataframe():
     """Test render with empty DataFrame."""
     df = pd.DataFrame()
     inspector = Inspector(df)
-    
+
     # Patch streamlit at the module level where it's used
-    with patch('luxin.inspector.st') as mock_st:
+    with patch("luxin.inspector.st") as mock_st:
         mock_st.dataframe = MagicMock()
         mock_st.info = MagicMock()
         # Mock the import inside render() by patching sys.modules
         import sys
-        original_streamlit = sys.modules.get('streamlit')
+
+        original_streamlit = sys.modules.get("streamlit")
         mock_streamlit_module = MagicMock()
         mock_streamlit_module.dataframe = MagicMock()
         mock_streamlit_module.info = MagicMock()
-        sys.modules['streamlit'] = mock_streamlit_module
-        
+        sys.modules["streamlit"] = mock_streamlit_module
+
         try:
             inspector.render()
             # Should call st.dataframe (even for empty DataFrame)
@@ -152,35 +149,34 @@ def test_inspector_render_empty_dataframe():
         finally:
             # Restore original streamlit module
             if original_streamlit:
-                sys.modules['streamlit'] = original_streamlit
-            elif 'streamlit' in sys.modules:
-                del sys.modules['streamlit']
+                sys.modules["streamlit"] = original_streamlit
+            elif "streamlit" in sys.modules:
+                del sys.modules["streamlit"]
 
 
 def test_inspector_multi_column_groupby():
     """Test Inspector with multi-column groupby."""
-    df = TrackedDataFrame({
-        'region': ['North', 'North', 'South', 'South'],
-        'product': ['A', 'B', 'A', 'B'],
-        'value': [10, 20, 30, 40]
-    })
-    agg = df.groupby(['region', 'product']).agg({'value': 'sum'})
+    df = TrackedDataFrame(
+        {
+            "region": ["North", "North", "South", "South"],
+            "product": ["A", "B", "A", "B"],
+            "value": [10, 20, 30, 40],
+        }
+    )
+    agg = df.groupby(["region", "product"]).agg({"value": "sum"})
     inspector = Inspector(agg)
-    
+
     assert inspector._is_aggregated is True
-    assert inspector._groupby_cols == ['region', 'product']
+    assert inspector._groupby_cols == ["region", "product"]
     assert len(inspector._source_mapping) > 0
 
 
 def test_inspector_source_mapping_accuracy():
     """Test that Inspector correctly extracts source mapping."""
-    df = TrackedDataFrame({
-        'category': ['A', 'A', 'B', 'B'],
-        'value': [10, 20, 30, 40]
-    })
-    agg = df.groupby('category').agg({'value': 'sum'})
+    df = TrackedDataFrame({"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40]})
+    agg = df.groupby("category").agg({"value": "sum"})
     inspector = Inspector(agg)
-    
+
     # Check that source mapping matches TrackedDataFrame
     assert inspector._source_mapping == agg._source_mapping
     assert inspector._groupby_cols == agg._groupby_cols
@@ -190,16 +186,13 @@ def test_inspector_source_mapping_accuracy():
 def test_inspector_with_config():
     """Test Inspector with custom configuration."""
     from luxin.config import InspectorConfig
-    
-    df = TrackedDataFrame({
-        'category': ['A', 'A', 'B'],
-        'value': [10, 20, 30]
-    })
-    agg = df.groupby('category').agg({'value': 'sum'})
-    
+
+    df = TrackedDataFrame({"category": ["A", "A", "B"], "value": [10, 20, 30]})
+    agg = df.groupby("category").agg({"value": "sum"})
+
     config = InspectorConfig(show_summary_stats=False)
     inspector = Inspector(agg, config=config)
-    
+
     assert inspector.config is config
     assert inspector.config.show_summary_stats is False
 
@@ -213,11 +206,25 @@ def test_inspector_validation_error():
 def test_inspector_empty_dataframe_with_config():
     """Test Inspector with empty DataFrame and config."""
     from luxin.config import InspectorConfig
-    
+
     df = pd.DataFrame()
     config = InspectorConfig()
     inspector = Inspector(df, config=config)
-    
+
     assert inspector.config is config
     assert inspector.df is df
 
+
+def test_inspector_render_warns_when_aggregated_but_missing_sources():
+    """Incomplete tracking metadata triggers a Streamlit warning and skips drill UI."""
+    df = TrackedDataFrame({"category": ["A"], "value": [1]})
+    agg = df.groupby("category").agg({"value": "sum"})
+    agg._source_df = None
+
+    inspector = Inspector(agg)
+    with patch("luxin.inspector.st") as mock_st:
+        mock_st.dataframe = MagicMock()
+        mock_st.warning = MagicMock()
+        inspector.render()
+        mock_st.warning.assert_called_once()
+        mock_st.dataframe.assert_called_once()

@@ -28,7 +28,7 @@ See the [User Guide](user-guide.md) for current capabilities and the [API Refere
 
 ### Phase 1: Core Enhancements (v0.3.0)
 
-**Timeline**: Q1 2024  
+**Timeline**: Original planning used Q1 2024 targets; timelines are illustrative and evolve with maintainer bandwidth (last reviewed 2026).  
 **Priority**: High  
 **Effort**: Medium
 

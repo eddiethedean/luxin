@@ -12,6 +12,8 @@ from typing import Any, Dict, List
 
 import pandas as pd
 
+from luxin.utils import normalize_group_key, finalize_source_mapping
+
 
 def display_drill_table(
     agg_df: pd.DataFrame,
@@ -108,14 +110,21 @@ def _row_tuple_key_from_agg_df(agg_df: pd.DataFrame, row_position: int) -> tuple
     """Source-mapping style tuple for one aggregated row (same convention as table_view)."""
     if isinstance(agg_df.index, pd.MultiIndex):
         key = agg_df.index[row_position]
-        return tuple(key) if isinstance(key, tuple) else (key,)
-    return (agg_df.index[row_position],)
+        raw = tuple(key) if isinstance(key, tuple) else (key,)
+    else:
+        raw = (agg_df.index[row_position],)
+    return normalize_group_key(raw)
 
 
 def _json_str_for_mapping_key(key: Any) -> str:
-    if isinstance(key, tuple):
-        return "|".join(str(k) for k in key)
-    return str(key)
+    parts = normalize_group_key(key)
+    out: List[str] = []
+    for p in parts:
+        if isinstance(p, pd.Timestamp):
+            out.append("__NaT__" if pd.isna(p) else p.isoformat())
+        else:
+            out.append(str(p))
+    return "|".join(out)
 
 
 def render_html(
@@ -136,6 +145,8 @@ def render_html(
     Returns:
         Complete HTML string for the interactive table
     """
+    source_mapping = finalize_source_mapping(dict(source_mapping))
+
     unique_id = "".join(random.choices(string.ascii_lowercase + string.digits, k=8))
 
     template_path = os.path.join(os.path.dirname(__file__), "templates", "table.html")

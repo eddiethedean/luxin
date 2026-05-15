@@ -9,6 +9,11 @@ from luxin.components.detail_panel import render_detail_panel
 from luxin.components.filters import render_filters
 from luxin.components.export import render_export_buttons
 from luxin.config import InspectorConfig, get_default_config
+from luxin.utils import finalize_source_mapping, normalize_group_key
+from luxin._streamlit_compat import (
+    dataframe_selection_guard_message,
+    dataframe_selection_supported,
+)
 
 
 def _ensure_groupby_columns_in_frame(
@@ -27,11 +32,27 @@ def _ensure_groupby_columns_in_frame(
     return out.reset_index()
 
 
+def _align_display_index_columns(
+    display_df: pd.DataFrame, agg_df: pd.DataFrame, groupby_cols: List[str]
+) -> pd.DataFrame:
+    """When ``reset_index()`` produced generic column names, rename them to ``groupby_cols``."""
+    if not groupby_cols:
+        return display_df
+    if all(c in display_df.columns for c in groupby_cols):
+        return display_df
+    idx_origin_cols = [c for c in display_df.columns if c not in agg_df.columns]
+    if len(idx_origin_cols) == len(groupby_cols):
+        return display_df.rename(columns=dict(zip(idx_origin_cols, groupby_cols)))
+    return display_df
+
+
 def _row_key_from_agg_position(agg_df: pd.DataFrame, position: int) -> tuple:
     """Build source_mapping key from a positional row in agg_df (legacy path)."""
     if isinstance(agg_df.index, pd.MultiIndex):
-        return tuple(agg_df.index[position])  # type: ignore[return-value]
-    return (agg_df.index[position],)
+        raw = tuple(agg_df.index[position])
+    else:
+        raw = (agg_df.index[position],)
+    return normalize_group_key(raw)
 
 
 def _agg_row_for_key(agg_df: pd.DataFrame, row_key: tuple) -> pd.Series:
@@ -63,7 +84,7 @@ def _resolve_row_key_from_selection(
         return None
     if groupby_cols and all(c in display_df.columns for c in groupby_cols):
         row = display_df.iloc[selected_row_num]
-        return tuple(row[c] for c in groupby_cols)
+        return normalize_group_key(tuple(row[c] for c in groupby_cols))
     if len(display_df) == len(agg_df) and display_df.index.equals(agg_df.index):
         return _row_key_from_agg_position(agg_df, selected_row_num)
     return None
@@ -89,6 +110,12 @@ def render_table_view(
     if config is None:
         config = get_default_config()
 
+    if not dataframe_selection_supported():
+        st.error(dataframe_selection_guard_message())
+        return
+
+    source_mapping = finalize_source_mapping(dict(source_mapping))
+
     st.header("📊 Aggregated Data")
 
     # Convert index to columns for display and for stable group-key lookup after filtering
@@ -99,6 +126,8 @@ def render_table_view(
         display_df = display_df.reset_index()
     else:
         display_df = _ensure_groupby_columns_in_frame(display_df, groupby_cols)
+
+    display_df = _align_display_index_columns(display_df, agg_df, groupby_cols)
 
     # Apply filters if enabled
     if config.show_filters:
@@ -174,9 +203,8 @@ def _show_row_details(
         detail_col: Streamlit column to render details in
     """
     with detail_col:
-        st.subheader("🔍 Detail Rows")
-
-        detail_indices = source_mapping.get(row_key, [])
+        nk = normalize_group_key(row_key)
+        detail_indices = source_mapping.get(nk, [])
 
         if not detail_indices:
             st.warning(
@@ -203,7 +231,7 @@ def _show_row_details(
 
         with st.expander("📋 Aggregated Values"):
             try:
-                agg_row = _agg_row_for_key(agg_df, row_key)
+                agg_row = _agg_row_for_key(agg_df, nk)
             except (KeyError, IndexError, TypeError):
                 st.info("Could not resolve aggregated row values for this selection.")
             else:

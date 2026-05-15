@@ -4,9 +4,12 @@ Polars DataFrame support for luxin.
 
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any, Union
 
 import pandas as pd
+
+if TYPE_CHECKING:
+    from luxin.tracked_df import TrackedDataFrame
 
 try:
     import polars as pl_runtime
@@ -38,7 +41,7 @@ def convert_polars_to_pandas(df: Union[pd.DataFrame, Any]) -> pd.DataFrame:
     raise TypeError(f"Expected Polars or pandas DataFrame, got {type(df)}")
 
 
-def create_tracked_from_polars(df: Any) -> pd.DataFrame:
+def create_tracked_from_polars(df: Any) -> "TrackedDataFrame":
     """
     Create a TrackedDataFrame from a Polars DataFrame.
 

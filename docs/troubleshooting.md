@@ -36,12 +36,11 @@ inspector.render()
 3. Version incompatibility
 
 **Solution**:
-```bash
-# Install Streamlit
-pip install streamlit
 
-# Or install luxin with Streamlit
-pip install luxin[streamlit]
+Luxin declares **Streamlit** as a dependency (dataframe row selections require Streamlit **1.35+**). Upgrade with:
+
+```bash
+pip install -U streamlit
 ```
 
 Make sure `render()` is called within a Streamlit app:

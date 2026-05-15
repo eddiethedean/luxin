@@ -2,9 +2,17 @@
 Filtering component for aggregated data tables.
 """
 
+from typing import Any, List
+
 import pandas as pd
 import pandas.api.types as pdt
 import streamlit as st
+
+
+def _sorted_unique_for_multiselect(series: pd.Series) -> List[Any]:
+    """Lexicographically sort unique values without cross-type comparisons (Python 3 safe)."""
+    vals = series.dropna().unique().tolist()
+    return sorted(vals, key=lambda x: (type(x).__name__, str(x)))
 
 
 def _column_uses_numeric_range_filter(series: pd.Series) -> bool:
@@ -44,7 +52,7 @@ def render_filters(df: pd.DataFrame, key_prefix: str = "luxin_filter") -> pd.Dat
     with st.expander("🔧 Column Filters", expanded=False):
         for col in df.columns:
             if not _column_uses_numeric_range_filter(df[col]):
-                unique_vals = sorted(df[col].dropna().unique().tolist(), key=str)
+                unique_vals = _sorted_unique_for_multiselect(df[col])
                 if (
                     len(unique_vals) > 0 and len(unique_vals) <= 50
                 ):  # Limit to reasonable number
