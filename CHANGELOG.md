@@ -29,8 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Aggregation builder**: template mode no longer disagrees with the group-by multiselect; guard when no group-by candidates exist.
 - **Comparison** (`luxin.compare`): UI and docstrings clarify Welch t-tests use pooled columns, not row-pairing by join keys.
 - **CI**: GitHub Actions tests and lint also run on the **`master`** branch (default for this repo).
-
-### Documentation
+- **Packaging**: `project.license` uses the PEP 621 table form (`{ text = "MIT" }`) so `pip install -e .` succeeds with current setuptools (fixes the CI install step).
 
 - User guide, API reference, and `examples/phase3_multi_level.py` document Phase 3 workflows.
 
