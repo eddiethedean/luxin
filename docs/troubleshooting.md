@@ -65,18 +65,17 @@ inspector.render()  # Must be in Streamlit context
 3. Use configuration to disable unnecessary features
 
 ```python
-from luxin import Inspector, TrackedDataFrame, InspectorConfig
+from luxin import Inspector, TrackedDataFrame
+from luxin.config import InspectorConfig
 
-# Filter before aggregating
-df = TrackedDataFrame(large_data)
-filtered_df = df[df['date'] > '2024-01-01']  # Filter first
-agg = filtered_df.groupby('category').sum()
-
-# Use config to optimize
 config = InspectorConfig(
-    show_summary_stats=False,  # Disable if not needed
-    detail_page_size=50  # Smaller page size
+    show_summary_stats=False,
+    detail_page_size=50,
 )
+
+df = TrackedDataFrame(large_data)
+filtered_df = df[df['date'] > '2024-01-01']
+agg = filtered_df.groupby('category').sum()
 inspector = Inspector(agg, config=config)
 inspector.render()
 ```
@@ -134,9 +133,18 @@ agg = df.groupby(['region', 'category']).sum()  # 'category' doesn't exist
 
 ## Session state conflicts
 
-**Problem**: Multiple Inspector instances conflict with each other.
+**Problem**: Multiple Inspector or drill hierarchies collide in Streamlit `session_state`.
 
-**Solution**: Inspector automatically uses unique keys based on DataFrame IDs. If you still have issues, create separate Streamlit apps or use different variable names.
+**Solution**: Use distinct configuration:
+
+```python
+from luxin.config import InspectorConfig
+
+cfg = InspectorConfig(inspector_session_key="sales_tab")
+inspector = Inspector(agg, config=cfg)
+```
+
+For multi-level drill, set **`DrillHierarchySpec.session_key`** per hierarchy. See also [Phase 3 in the roadmap](roadmap.md).
 
 ## Getting Help
 

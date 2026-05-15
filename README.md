@@ -19,7 +19,8 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 * 🚀 **Zero-config** - Get started with minimal setup
 * 🎨 **Modern UI** - Clean, responsive interface with side-by-side detail view
 * 📈 **Multi-column grouping** - Support for complex multi-level aggregations
-* 🔧 **Configurable** - Customize UI behavior with InspectorConfig
+* 🔧 **Configurable** - Customize UI behavior with `InspectorConfig` (`luxin.config`)
+* 🧭 **Phase 3 (v0.3.0)** - Optional multi-level drill (`DrillHierarchySpec`), comparison views (`luxin.compare`), data-quality panel, and aggregation builder—all feature-flagged; defaults stay backward compatible
 * ✅ **Well-tested** - 85%+ test coverage with comprehensive test suite
 
 ## 📦 Installation
@@ -28,9 +29,11 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 pip install luxin
 ```
 
-For Polars support (optional):
+Optional extras:
+
 ```bash
-pip install luxin[polars]
+pip install luxin[polars]    # Polars → pandas / TrackedDataFrame helpers
+pip install luxin[compare]   # SciPy for optional Welch t-tests in luxin.compare.inspect_pair
 ```
 
 ## 🚀 Quick Start
@@ -142,11 +145,13 @@ Check out the example files:
 
 - [Basic Usage](examples/basic_usage.py) - Simple examples of Inspector API
 - [Sales Analysis](examples/sales_analysis.py) - Real-world sales data exploration
+- [Phase 3 demo](examples/phase3_multi_level.py) - Multi-level drill, quality panel, aggregation builder flags
 
 Run examples with Streamlit:
 ```bash
 streamlit run examples/basic_usage.py
 streamlit run examples/sales_analysis.py
+streamlit run examples/phase3_multi_level.py
 ```
 
 ## 📚 Documentation
@@ -159,7 +164,8 @@ Comprehensive documentation is available:
 - [Examples](docs/examples.md) - Code examples and tutorials
 - [Roadmap](docs/roadmap.md) - Future features and development plans
 - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
-- [Migration Guide](docs/migration.md) - Migrating from v0.1.0 to v0.2.0+
+- [Migration Guide](docs/migration.md) - Migrating from legacy APIs; what’s new through **v0.3.0**
+- [Changelog](CHANGELOG.md) - Release history
 
 Full documentation: https://luxin.readthedocs.io/
 
@@ -171,18 +177,18 @@ git clone https://github.com/eddiethedean/luxin.git
 cd luxin
 pip install -e ".[dev]"
 
-# Run tests
-pytest tests/
+# Run tests (if global pytest plugins emit async-fixture errors on your machine):
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/
 
 # Run tests with coverage
-pytest tests/ --cov=luxin --cov-report=html
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ --cov=luxin --cov-report=html
 ```
 
 ### Test Coverage
 
 Luxin maintains **85%+ test coverage** with comprehensive tests for:
 - Core Inspector functionality
-- UI components (table view, detail panel, filters, export)
+- UI components (table view, drill stack, breadcrumbs, detail panel, filters, export, Phase 3 modules)
 - Data validation and error handling
 - Polars integration
 - Configuration management
@@ -204,17 +210,19 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📌 Current release
 
-**v0.2.1** — see [CHANGELOG.md](CHANGELOG.md) for fixes and dependency notes (notably **Streamlit >= 1.35** for interactive tables).
+**v0.3.0** — Phase 3 features (multi-level drill, comparison helpers, data quality, aggregation builder); see [CHANGELOG.md](CHANGELOG.md). **v0.2.1** fixes (Streamlit packaging, selection API, key normalization) remain documented there.
+
+**Requirements**: **Streamlit >= 1.35** for dataframe row selection (`on_select` / `selection_mode`).
 
 ## 🗺️ Roadmap
 
-Check out our [Roadmap](docs/roadmap.md) to see what's coming next! Planned features include:
+See [Roadmap](docs/roadmap.md) for the full picture. At a glance:
 
-- **v0.3.0**: Enhanced visualizations, advanced filtering, performance optimizations
-- **v0.4.0**: SQL database integration, cloud storage support
-- **v0.5.0**: Multi-level drill-down, comparison mode, data quality indicators
-- **v0.6.0**: Collaboration tools, sharing, annotations
-- **v1.0.0**: Enterprise features, authentication, audit logging
+- **v0.3.0** (current): Phase 3 shipped — optional drill hierarchy, `luxin.compare`, quality dashboard, aggregation builder
+- **target v0.4.0**: Phase 1 core enhancements (charts, richer filters, performance, export)
+- **target v0.5.0**: Phase 2 data sources (SQL, cloud, APIs)
+- **target v0.6.0**: Phase 4 collaboration & sharing
+- **target v1.0.0**: Phase 5 enterprise features
 
 ## 🔗 Links
 

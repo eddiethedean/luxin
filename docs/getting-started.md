@@ -17,11 +17,16 @@ For Polars support:
 pip install luxin[polars]
 ```
 
+For optional **SciPy**-backed statistical tests in **`luxin.compare.inspect_pair`**:
+```bash
+pip install luxin[compare]
+```
+
 ## Requirements
 
 - Python 3.8 or higher
 - pandas >= 1.3.0
-- streamlit >= 1.0.0
+- **streamlit >= 1.35** (Luxin relies on dataframe row selection: `on_select` / `selection_mode`)
 
 ## Your First Luxin App
 
@@ -67,7 +72,7 @@ streamlit run app.py
 
 ## Next Steps
 
-- Read the [User Guide](user-guide.md) for comprehensive usage documentation
-- Check out [Examples](examples.md) for more code samples
-- Explore the [API Reference](api-reference.md) for detailed API documentation
+- Read the [User Guide](user-guide.md), including Phase 3 (v0.3.0) optional features (multi-level drill, comparison, quality, aggregation builder)
+- Check out [Examples](examples.md) and run `examples/phase3_multi_level.py` with Streamlit
+- Explore the [API Reference](api-reference.md) for `Inspector`, `InspectorConfig`, and `DrillHierarchySpec`
 

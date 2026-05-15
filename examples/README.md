@@ -1,78 +1,55 @@
 # Luxin Examples
 
-This directory contains example scripts and notebooks demonstrating how to use Luxin.
+Runnable **Streamlit** scripts and Jupyter notebooks demonstrating Luxin **v0.3.0**.
 
-## Examples
+## Streamlit scripts
 
-### 1. basic_usage.py
-Demonstrates the basic features of Luxin:
-- Using `TrackedDataFrame` for automatic tracking
-- Using `create_drill_table()` for manual API
-- Multi-column groupby operations
+Use `Inspector(agg).render()` (recommended API). Older `create_drill_table` patterns still exist for legacy integrations but emit deprecation notices where applicable.
 
-Run with:
+### `basic_usage.py`
+
+Core flow: `TrackedDataFrame` → `groupby` → `Inspector` → `render()`.
+
 ```bash
-python basic_usage.py
+streamlit run examples/basic_usage.py
 ```
 
-### 2. sales_analysis.py
-A more realistic example showing how to analyze sales data with drill-down capabilities:
-- Analyzing sales by category
-- Analyzing sales by region and category
-- Finding top customers
+### `sales_analysis.py`
 
-Run with:
+Richer sales-style exploration (multi-level groupby, etc.).
+
 ```bash
-python sales_analysis.py
+streamlit run examples/sales_analysis.py
 ```
 
-## Jupyter Notebooks
+### `phase3_multi_level.py` (v0.3.0)
 
-To see the interactive drill-down tables in action, create a Jupyter notebook and run:
+Optional Phase 3 flags: multi-level drill (`DrillHierarchySpec`), data-quality panel, aggregation builder footer, comparison API hint.
+
+```bash
+streamlit run examples/phase3_multi_level.py
+```
+
+### Optional extras
+
+```bash
+pip install 'luxin[compare]'   # SciPy for optional t-tests in luxin.compare.inspect_pair
+pip install 'luxin[polars]'
+```
+
+Interactive tables require **Streamlit >= 1.35**.
+
+## Jupyter notebooks
+
+Notebook copies of some flows live beside these scripts (`01_getting_started.ipynb`, etc.). In notebooks you can still use `Inspector(...).render()` inside a compatible Streamlit context, or browse legacy HTML backends as documented—prefer migrating to **`Inspector`** for parity with Streamlit apps.
+
+## Legacy snippets (avoid in new apps)
+
+Older docs sometimes showed:
 
 ```python
-from luxin import TrackedDataFrame
-
-# Create your data
-df = TrackedDataFrame({
-    'category': ['A', 'A', 'B', 'B', 'C'],
-    'value': [10, 20, 30, 40, 50]
-})
-
-# Aggregate
-agg = df.groupby('category').agg({'value': 'sum'})
-
-# Display with drill-down
-agg.show_drill_table()
+agg.show_drill_table()       # deprecated; use Inspector(agg).render()
+create_drill_table(...)      # legacy; prefer TrackedDataFrame + Inspector
 ```
 
-Click on any row in the aggregated table to see the underlying detail rows in the side panel!
-
-## Streamlit Apps
-
-To use Luxin in a Streamlit app:
-
-```python
-import streamlit as st
-from luxin import create_drill_table
-import pandas as pd
-
-st.title("Sales Analysis")
-
-# Your data
-df = pd.DataFrame({
-    'category': ['A', 'A', 'B', 'B', 'C'],
-    'value': [10, 20, 30, 40, 50]
-})
-
-agg_df = df.groupby('category').sum()
-
-# Display drill-down table
-create_drill_table(agg_df, df, groupby_cols=['category'])
-```
-
-Run with:
-```bash
-streamlit run your_app.py
-```
-
+See [Migration guide](../docs/migration.md).

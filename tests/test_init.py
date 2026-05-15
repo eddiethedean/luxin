@@ -43,10 +43,13 @@ def test_getattr_with_invalid_name():
 def test_all_exports():
     """Test that all expected exports are available."""
     from luxin import (
+        DrillHierarchySpec,
         create_tracked_from_polars,
         convert_polars_to_pandas,
         is_polars_dataframe,
     )
+
+    assert DrillHierarchySpec is not None
 
     assert Inspector is not None
     assert TrackedDataFrame is not None

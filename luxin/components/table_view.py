@@ -5,10 +5,17 @@ Table view component for displaying aggregated data with drill-down.
 import pandas as pd
 import streamlit as st
 from typing import Any, Dict, List, Optional
+from luxin.components.breadcrumbs import render_drill_breadcrumbs
 from luxin.components.detail_panel import render_detail_panel
 from luxin.components.filters import render_filters
 from luxin.components.export import render_export_buttons
 from luxin.config import InspectorConfig, get_default_config
+from luxin.drill_hierarchy import (
+    DrillHierarchySpec,
+    ensure_initial_stack,
+    stack_state_key,
+    try_push_selected,
+)
 from luxin.utils import finalize_source_mapping, normalize_group_key
 from luxin._streamlit_compat import (
     dataframe_selection_guard_message,
@@ -88,6 +95,123 @@ def _resolve_row_key_from_selection(
     if len(display_df) == len(agg_df) and display_df.index.equals(agg_df.index):
         return _row_key_from_agg_position(agg_df, selected_row_num)
     return None
+
+
+def render_drill_stack_view(
+    root_tracked_agg: Any,
+    spec: DrillHierarchySpec,
+    config: Optional[InspectorConfig] = None,
+) -> None:
+    """
+    Multi-level drill: breadcrumb stack + aggregated table at current depth + detail panel.
+    """
+    if config is None:
+        config = get_default_config()
+
+    if not dataframe_selection_supported():
+        st.error(dataframe_selection_guard_message())
+        return
+
+    ensure_initial_stack(st.session_state, spec, root_tracked_agg)
+    stack = list(st.session_state[stack_state_key(spec)])
+    render_drill_breadcrumbs(stack, spec)
+
+    current = stack[-1]
+    agg_df = current.agg_df
+    detail_df = current.detail_df
+    source_mapping = finalize_source_mapping(dict(current.source_mapping))
+    groupby_cols = list(current.groupby_cols)
+
+    st.header("📊 Aggregated Data")
+
+    display_df = agg_df.copy()
+    if isinstance(display_df.index, pd.MultiIndex):
+        display_df = display_df.reset_index()
+    elif display_df.index.name is not None:
+        display_df = display_df.reset_index()
+    else:
+        display_df = _ensure_groupby_columns_in_frame(display_df, groupby_cols)
+
+    display_df = _align_display_index_columns(display_df, agg_df, groupby_cols)
+
+    if config.show_filters:
+        filter_key = f"luxin_filter_drill_{spec.session_key}_{len(stack)}"
+        display_df = render_filters(display_df, key_prefix=filter_key)
+
+    if len(display_df) > 0:
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            table_key = f"luxin_table_{spec.session_key}_{len(stack)}"
+            selected_rows = st.dataframe(
+                display_df,
+                use_container_width=True,
+                height=config.table_height,
+                on_select="rerun",
+                selection_mode="single-row",
+                key=table_key,
+            )
+
+        row_key: Optional[tuple] = None
+        if selected_rows.selection.rows:  # type: ignore[attr-defined]
+            selected_row_num = selected_rows.selection.rows[0]  # type: ignore[attr-defined]
+            row_key = _resolve_row_key_from_selection(
+                display_df, selected_row_num, groupby_cols, agg_df
+            )
+
+        old_len = len(stack)
+        if row_key is not None:
+            try_push_selected(
+                st.session_state,
+                stack,
+                row_key,
+                spec,
+                absolute_max_depth=config.max_drill_depth,
+            )
+            stack = list(st.session_state[stack_state_key(spec)])
+            current = stack[-1]
+            agg_df = current.agg_df
+            detail_df = current.detail_df
+            source_mapping = finalize_source_mapping(dict(current.source_mapping))
+            groupby_cols = list(current.groupby_cols)
+
+        if row_key is not None:
+            if len(stack) > old_len:
+                parent = stack[-2]
+                _show_row_details(
+                    row_key,
+                    parent.agg_df,
+                    parent.detail_df,
+                    parent.source_mapping,
+                    parent.groupby_cols,
+                    col2,
+                    config,
+                )
+            else:
+                _show_row_details(
+                    row_key,
+                    agg_df,
+                    detail_df,
+                    source_mapping,
+                    groupby_cols,
+                    col2,
+                    config,
+                )
+        else:
+            with col2:
+                st.info("👆 Click on a row in the table to see detail data")
+    else:
+        st.warning("No data to display.")
+
+    if config.show_export_buttons:
+        with st.expander("📥 Export Data", expanded=False):
+            render_export_buttons(display_df, filename_prefix="aggregated_data")
+
+    if config.show_summary_stats and len(agg_df) > 0 and len(agg_df.columns) > 0:
+        with st.expander("📈 Summary Statistics"):
+            try:
+                st.dataframe(agg_df.describe(), use_container_width=True)
+            except ValueError:
+                st.info("No statistics available for this data.")
 
 
 def render_table_view(
@@ -228,6 +352,11 @@ def _show_row_details(
             height=config.detail_height,
             page_size=config.detail_page_size,
         )
+
+        if config.show_data_quality:
+            from luxin.components.quality_indicators import render_quality_dashboard
+
+            render_quality_dashboard(detail_rows)
 
         with st.expander("📋 Aggregated Values"):
             try:

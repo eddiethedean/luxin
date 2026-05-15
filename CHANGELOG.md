@@ -5,6 +5,26 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-05-15
+
+### Added
+
+- **Phase 3 (advanced UX)**: multi-level drill-down with `DrillHierarchySpec`, breadcrumbs, and session-scoped stacks (`luxin_drill_*` keys plus optional `DrillHierarchySpec.session_key`).
+- **`InspectorConfig` flags**: `enable_multi_level_drill`, `max_drill_depth`, `show_data_quality`, `show_aggregation_builder`, `compare_run_significance`, `show_comparison_entrypoint`, and `inspector_session_key` namespacing.
+- **`luxin.components.quality_indicators`**: completeness/uniqueness-style metrics plus optional numeric outlier flags (IQR or z-score style).
+- **Comparison tooling** (`luxin.compare.inspect_pair`): side-by-side tables, merged diff deltas / percent change, optional Welch t-tests when SciPy is installed (`luxin[compare]` extra).
+- **Aggregation builder** expander sourced from the original inspected detail frame (`TrackedDataFrame._source_df` snapshot).
+- **`luxin.DrillHierarchySpec` export for stable authoring of drill hierarchies.**
+
+### Changed
+
+- `Inspector(..., drill=...)` activates multi-level stacks only when `enable_multi_level_drill` is `True`; default behavior remains unchanged.
+- Aggregation builder overrides stash the rebuilt `TrackedDataFrame` under `luxin_agg_override_{session}` with an explicit Clear control.
+
+### Documentation
+
+- User guide, API reference, and `examples/phase3_multi_level.py` document Phase 3 workflows.
+
 ## [0.2.1] - 2026-05-15
 
 ### Fixed

@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 
+import sys
+
 import pandas as pd
 
 from luxin.display import _detect_environment, render_html
@@ -22,14 +24,18 @@ def test_detect_environment_prefers_active_streamlit_context(mock_ctx):
 
 def test_detect_environment_jupyter_via_ipython():
     """IPython-only sessions resolve as Jupyter when not in Streamlit."""
-    with patch("streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None):
-        with patch("IPython.get_ipython", return_value=MagicMock()):
+    ip_mod = MagicMock()
+    ip_mod.get_ipython = MagicMock(return_value=MagicMock())
+    with patch.dict(sys.modules, {"IPython": ip_mod}):
+        with patch("streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None):
             assert _detect_environment() == "jupyter"
 
 
 def test_detect_environment_unknown_without_ctx_or_ipython():
-    with patch("streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None):
-        with patch("IPython.get_ipython", return_value=None):
+    ip_empty = MagicMock()
+    ip_empty.get_ipython = MagicMock(return_value=None)
+    with patch.dict(sys.modules, {"IPython": ip_empty}):
+        with patch("streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None):
             assert _detect_environment() == "unknown"
 
 

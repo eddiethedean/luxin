@@ -4,11 +4,15 @@ Inspector - Main class for interactive data exploration with drill-down capabili
 
 import pandas as pd
 import streamlit as st
-from typing import Optional, Dict, Any, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
 from luxin.polars_support import handle_polars_in_inspector, is_polars_dataframe
 from luxin.config import InspectorConfig, get_default_config
 from luxin.validation import validate_dataframe, ValidationError
 from luxin.utils import finalize_source_mapping
+
+if TYPE_CHECKING:
+    from luxin.drill_hierarchy import DrillHierarchySpec
 
 
 class Inspector:
@@ -30,7 +34,11 @@ class Inspector:
     """
 
     def __init__(
-        self, df: Union[pd.DataFrame, Any], config: Optional[InspectorConfig] = None
+        self,
+        df: Union[pd.DataFrame, Any],
+        config: Optional[InspectorConfig] = None,
+        *,
+        drill: Optional["DrillHierarchySpec"] = None,
     ) -> None:
         """
         Initialize the Inspector with a DataFrame.
@@ -39,6 +47,7 @@ class Inspector:
             df: The DataFrame to inspect. Can be a regular pandas DataFrame,
                 Polars DataFrame, or a TrackedDataFrame with aggregation tracking.
             config: Optional configuration object. If None, uses default config.
+            drill: Optional hierarchical drill specification (Phase 3) when aggregated.
         """
         # Handle Polars DataFrames
         if is_polars_dataframe(df):
@@ -52,21 +61,42 @@ class Inspector:
 
         self.df = df
         self.config = config if config is not None else get_default_config()
+        self.drill = drill
+
         self._is_aggregated = False
         self._source_mapping: Dict[Any, List[int]] = {}
         self._groupby_cols: List[str] = []
         self._source_df: Optional[pd.DataFrame] = None
 
-        # Check if this is a TrackedDataFrame with aggregation info
-        if hasattr(df, "_is_aggregated") and df._is_aggregated:
-            self._is_aggregated = True
-            raw_map = getattr(df, "_source_mapping", {})
-            if isinstance(raw_map, dict):
-                self._source_mapping = finalize_source_mapping(dict(raw_map))
-            else:
-                self._source_mapping = {}
-            self._groupby_cols = getattr(df, "_groupby_cols", [])
-            self._source_df = getattr(df, "_source_df", None)
+        self._capture_tracked_props(self.df)
+        self._aggregation_builder_source = (
+            self._source_df.copy() if self._source_df is not None else None
+        )
+
+    def _capture_tracked_props(self, df: Union[pd.DataFrame, Any]) -> None:
+        """Refresh aggregation metadata snapshots from ``df``."""
+
+        self._is_aggregated = bool(getattr(df, "_is_aggregated", False))
+        raw_map = getattr(df, "_source_mapping", {})
+        if isinstance(raw_map, dict):
+            self._source_mapping = finalize_source_mapping(dict(raw_map))
+        else:
+            self._source_mapping = {}
+        self._groupby_cols = list(getattr(df, "_groupby_cols", []))
+        src = getattr(df, "_source_df", None)
+        if src is None:
+            self._source_df = None
+        elif isinstance(src, pd.DataFrame):
+            self._source_df = src
+        else:
+            self._source_df = pd.DataFrame(src)
+
+    def _session_suffix(self) -> str:
+        return (
+            self.config.inspector_session_key
+            if self.config.inspector_session_key is not None
+            else hex(id(self))
+        )
 
     def render(self) -> None:
         """
@@ -76,10 +106,41 @@ class Inspector:
         It will display the aggregated data (if available) or the
         source data, with interactive drill-down capabilities.
         """
+        suffix = self._session_suffix()
+        override_key = f"luxin_agg_override_{suffix}"
+        tracked_override = st.session_state.get(override_key)
+        override_active = getattr(tracked_override, "_is_aggregated", False) is True
+        if override_active:
+            effective_df = tracked_override
+            self._capture_tracked_props(tracked_override)
+        else:
+            effective_df = self.df
+            self._capture_tracked_props(self.df)
+
+        if self.config.show_comparison_entrypoint:
+            with st.expander("Compare aggregates (API hint)", expanded=False):
+                st.markdown(
+                    "```python\n"
+                    "from luxin.compare import inspect_pair\n"
+                    "inspect_pair(left_agg_df, right_agg_df, ['region'], config=inspector.config)\n"
+                    "```",
+                    unsafe_allow_html=False,
+                )
+
+        if (
+            override_active
+            and self.drill is not None
+            and self.config.enable_multi_level_drill
+        ):
+            st.info(
+                "Custom aggregation replaces the inspected root frame; clearing drill stack semantics."
+                " Multi-level drill is disabled until the override is cleared."
+            )
+
         if self._is_aggregated and (
             self._source_df is None or len(self._source_mapping) == 0
         ):
-            st.dataframe(self.df, use_container_width=True)
+            st.dataframe(effective_df, use_container_width=True)
             st.warning(
                 "Aggregation metadata is incomplete: drill-down requires a non-empty "
                 "source_mapping and `_source_df` from ``TrackedDataFrame.groupby().agg()`` (or equivalent). "
@@ -88,16 +149,35 @@ class Inspector:
             return
 
         if self._is_aggregated and self._source_df is not None:
-            # Display aggregated view with drill-down
-            from luxin.components.table_view import render_table_view
+            from luxin.components.table_view import render_drill_stack_view, render_table_view
 
-            render_table_view(
-                agg_df=self.df,
-                detail_df=self._source_df,
-                source_mapping=self._source_mapping,
-                groupby_cols=self._groupby_cols,
-                config=self.config,
+            drill_active = (
+                not override_active
+                and self.drill is not None
+                and self.config.enable_multi_level_drill
             )
+
+            if drill_active:
+                render_drill_stack_view(effective_df, self.drill, config=self.config)
+            else:
+                render_table_view(
+                    agg_df=effective_df,
+                    detail_df=self._source_df,
+                    source_mapping=self._source_mapping,
+                    groupby_cols=self._groupby_cols,
+                    config=self.config,
+                )
+
+            if (
+                self.config.show_aggregation_builder
+                and self._aggregation_builder_source is not None
+            ):
+                from luxin.components.aggregation_builder import render_footer_aggregation_builder
+
+                render_footer_aggregation_builder(
+                    self._aggregation_builder_source,
+                    session_key_suffix=suffix,
+                )
         else:
             # Display source data only (no aggregation tracking)
             st.dataframe(self.df, use_container_width=True)
@@ -111,3 +191,4 @@ class Inspector:
                 "inspector.render()\n"
                 "```"
             )
+

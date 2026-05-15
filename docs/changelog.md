@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 The canonical copy for GitHub and releases also lives at the repository root as [`CHANGELOG.md`](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md).
 
+## [0.3.0] - 2026-05-15
+
+Phase 3 features (this release): multi-level drill (`DrillHierarchySpec` + breadcrumbs), data-quality dashboard, comparison views (`luxin.compare.inspect_pair`), aggregation builder expander, optional SciPy extra `luxin[compare]`, and new `InspectorConfig` flags. See root `CHANGELOG.md` for full notes.
+
 ## [0.2.1] - 2026-05-15
 
 ### Fixed

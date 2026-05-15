@@ -82,6 +82,9 @@ def test_inspector_render_non_aggregated():
     with patch("luxin.inspector.st") as mock_st:
         mock_st.dataframe = MagicMock()
         mock_st.info = MagicMock()
+        mock_st.markdown = MagicMock()
+        mock_st.session_state = MagicMock()
+        mock_st.session_state.get = MagicMock(return_value=None)
         # Mock the import inside render() by patching sys.modules
         import sys
 
@@ -112,7 +115,8 @@ def test_inspector_render_aggregated():
     inspector = Inspector(agg)
 
     with patch("luxin.components.table_view.render_table_view") as mock_render:
-        with patch("luxin.inspector.st"):
+        with patch("luxin.inspector.st") as mock_inspector_st:
+            mock_inspector_st.session_state.get = MagicMock(return_value=None)
             inspector.render()
 
             # Should call render_table_view
@@ -122,6 +126,28 @@ def test_inspector_render_aggregated():
             assert call_args[1]["detail_df"] is inspector._source_df
             assert call_args[1]["source_mapping"] == inspector._source_mapping
             assert call_args[1]["groupby_cols"] == inspector._groupby_cols
+
+
+def test_inspector_render_multilevel_drill():
+    """Multi-level drill path dispatches when flag + drill spec are configured."""
+    from luxin.config import InspectorConfig
+    from luxin.drill_hierarchy import DrillHierarchySpec
+
+    df = TrackedDataFrame({"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40]})
+    agg = df.groupby("category").agg({"value": "sum"})
+    spec = DrillHierarchySpec(
+        session_key="unittest_drill",
+        next_level=lambda _k, rows: TrackedDataFrame(rows).groupby("category").agg({"value": "mean"}),
+    )
+    config = InspectorConfig(enable_multi_level_drill=True)
+
+    inspector = Inspector(agg, config=config, drill=spec)
+
+    with patch("luxin.components.table_view.render_drill_stack_view") as drill_render:
+        with patch("luxin.inspector.st") as mock_st:
+            mock_st.session_state.get = MagicMock(return_value=None)
+            inspector.render()
+            drill_render.assert_called_once()
 
 
 def test_inspector_render_empty_dataframe():

@@ -2,6 +2,16 @@
 
 Code examples and tutorials for using Luxin.
 
+## Phase 3 example (v0.3.0)
+
+Multi-level drill, optional quality panel, aggregation builder, and comparison entrypoint (all behind `InspectorConfig`). See the runnable script:
+
+```bash
+streamlit run examples/phase3_multi_level.py
+```
+
+Full walkthrough: [User Guide — Advanced Usage](user-guide.md#advanced-usage).
+
 ## Basic Example
 
 Simple example showing the core functionality:
@@ -155,5 +165,6 @@ Or check out the example files in the `examples/` directory:
 ```bash
 streamlit run examples/basic_usage.py
 streamlit run examples/sales_analysis.py
+streamlit run examples/phase3_multi_level.py
 ```
 

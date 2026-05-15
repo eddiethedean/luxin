@@ -8,7 +8,7 @@ Luxin aims to become the go-to tool for interactive data exploration in Streamli
 
 - **Enhanced Visualizations**: Adding charting capabilities to make data insights more intuitive
 - **Expanded Data Sources**: Supporting SQL databases, cloud storage, and APIs
-- **Advanced Features**: Multi-level drill-down, comparison mode, and data quality indicators
+- **Advanced Features (Phase 3, v0.3.0)**: Multi-level drill-down, comparison mode, aggregation builder, and data quality indicators—see [User Guide](user-guide.md) and [Roadmap](roadmap.md) Phase 3.
 - **Collaboration Tools**: Sharing, annotations, and user preferences
 - **Enterprise Readiness**: Authentication, audit logging, and scheduled reports
 
@@ -17,6 +17,7 @@ Luxin aims to become the go-to tool for interactive data exploration in Streamli
 Luxin is a Streamlit-first tool for interactive drill-down data exploration with:
 
 - **Core Features**: `Inspector` class pattern, `TrackedDataFrame` for automatic source tracking
+- **Phase 3 (v0.3.0)**: Optional multi-level drill (`DrillHierarchySpec`), comparison helpers (`luxin.compare`), data-quality panel, aggregation builder—feature-flagged and backward compatible
 - **UI Components**: Native Streamlit components, filtering, export, pagination
 - **Data Support**: Pandas, Polars (optional), Jupyter (legacy)
 - **Code Quality**: 85% test coverage, modular architecture
@@ -26,7 +27,7 @@ See the [User Guide](user-guide.md) for current capabilities and the [API Refere
 
 ## Roadmap Phases
 
-### Phase 1: Core Enhancements (v0.3.0)
+### Phase 1: Core Enhancements (target v0.4.0)
 
 **Timeline**: Original planning used Q1 2024 targets; timelines are illustrative and evolve with maintainer bandwidth (last reviewed 2026).  
 **Priority**: High  
@@ -114,7 +115,7 @@ Expand export capabilities beyond CSV, JSON, and Excel.
 
 ---
 
-### Phase 2: Data Source Expansion (v0.4.0)
+### Phase 2: Data Source Expansion (target v0.5.0)
 
 **Timeline**: Q2 2024  
 **Priority**: Medium  
@@ -195,94 +196,52 @@ Fetch data from REST APIs and GraphQL endpoints.
 
 ---
 
-### Phase 3: Advanced Features (v0.5.0)
+### Phase 3: Advanced Features — **shipped in v0.3.0**
 
-**Timeline**: Q3 2024  
-**Priority**: Medium  
-**Effort**: High
+**Released**: 2026 (see [CHANGELOG](../CHANGELOG.md)).  
+**Priority** (original plan): Medium  
+**Effort** (original plan): High
+
+This phase is **complete** in the library: multi-level drill-down, comparison mode, custom aggregation UI, and data quality indicators ship behind `InspectorConfig` defaults (opt-in where noted). The notes below describe what was delivered; filenames match the implementation.
 
 #### 3.1 Multi-level Drill-down
 
-Support nested aggregations with multiple drill-down levels.
+**Delivered**:
+- Nested aggregations via `DrillHierarchySpec` + `Inspector(..., drill=spec)` with `enable_multi_level_drill=True`
+- Breadcrumb navigation (`luxin/components/breadcrumbs.py`) and session stack keys `luxin_drill_stack_{session_key}`
+- `luxin/drill_hierarchy.py` for stack push/pop, callback or precomputed child lookup
 
-**Features**:
-- Nested aggregations: Drill down multiple levels (e.g., Region → City → Store)
-- Breadcrumb navigation: Show current drill-down path
-- Back navigation: Return to previous aggregation levels
+**Example** (see also `examples/phase3_multi_level.py`):
 
-**Implementation**:
-- Extend `Inspector` to support nested source mappings
-- New component: `luxin/components/breadcrumbs.py`
-- Update `luxin/components/table_view.py` for multi-level support
-
-**Files to Create/Modify**:
-- `luxin/inspector.py` (enhance for nested mappings)
-- `luxin/components/table_view.py` (multi-level support)
-- `luxin/components/breadcrumbs.py` (new)
-
-**Example Usage**:
 ```python
-# First level: by region
-agg1 = df.groupby('region').sum()
-inspector = Inspector(agg1)
+from luxin import Inspector, TrackedDataFrame, DrillHierarchySpec
+from luxin.config import InspectorConfig
 
-# Drill down to city level
-agg2 = detail_df.groupby(['region', 'city']).sum()
-# Inspector automatically handles nested drill-down
+def next_level(_key, rows):
+    t = TrackedDataFrame(rows)
+    return t.groupby("city").agg({"value": "sum"})
+
+spec = DrillHierarchySpec(session_key="demo", next_level=next_level)
+root = TrackedDataFrame(df).groupby("region").agg({"value": "sum"})
+cfg = InspectorConfig(enable_multi_level_drill=True)
+Inspector(root, config=cfg, drill=spec).render()
 ```
 
 #### 3.2 Comparison Mode
 
-Compare two aggregated views side-by-side.
-
-**Features**:
-- Side-by-side comparison: Compare two aggregated views
-- Diff view: Highlight differences between datasets
-- Statistical comparison: Show percentage differences, significance tests
-
-**Implementation**:
-- New component: `luxin/components/comparison.py`
-- Extend `Inspector` to support comparison mode
-
-**Files to Create/Modify**:
-- `luxin/components/comparison.py` (new)
-- `luxin/inspector.py` (add comparison mode)
+**Delivered**: `luxin.compare.inspect_pair` / `luxin/components/comparison.py` — side-by-side tables, joined diff with deltas and optional Welch t-tests when `luxin[compare]` (SciPy) is installed.
 
 #### 3.3 Custom Aggregations UI
 
-Build custom aggregations without writing code.
-
-**Features**:
-- Visual aggregation builder: Build custom aggregations without code
-- Pre-defined templates: Common aggregation patterns (Pareto, cohort analysis)
-- Custom functions: Support for user-defined aggregation functions
-
-**Implementation**:
-- New component: `luxin/components/aggregation_builder.py`
-- Template library: Common aggregation patterns
-
-**Files to Create/Modify**:
-- `luxin/components/aggregation_builder.py` (new)
+**Delivered**: `luxin/components/aggregation_builder.py` with templates; enabled via `show_aggregation_builder` on the original inspected `_source_df` snapshot.
 
 #### 3.4 Data Quality Indicators
 
-Show data quality metrics and highlight issues.
-
-**Features**:
-- Quality metrics: Show data quality scores (completeness, uniqueness, validity)
-- Anomaly detection: Highlight outliers and anomalies in detail view
-- Quality dashboard: Summary view of data quality issues
-
-**Implementation**:
-- New component: `luxin/components/quality_indicators.py`
-- Integrate with data quality libraries or build custom
-
-**Files to Create/Modify**:
-- `luxin/components/quality_indicators.py` (new)
+**Delivered**: `luxin/components/quality_indicators.py`; enabled via `show_data_quality` in the detail path.
 
 ---
 
-### Phase 4: Collaboration & Sharing (v0.6.0)
+### Phase 4: Collaboration & Sharing (target v0.6.0)
 
 **Timeline**: Q4 2024  
 **Priority**: Low  
@@ -470,8 +429,8 @@ These features provide immediate value with relatively low effort:
 These features need architectural decisions:
 
 1. **SQL database integration** - Requires data source abstraction
-2. **Multi-level drill-down** - Needs nested mapping structure
-3. **Comparison mode** - Requires dual Inspector support
+2. **Chart + export enhancements** (Phase 1) - Plotly/reporting choices
+3. **Performance at scale** (Phase 1) - Caching and lazy detail loading
 
 ### Long-term (Requires architecture decisions)
 
@@ -532,10 +491,9 @@ All new dependencies should be optional (except plotly for Phase 1) to keep the 
 - All new features are additive
 - Backward compatibility maintained
 
-### Phase 3
-- **May require config changes** for multi-level drill-down
-- New `InspectorConfig` options
-- Migration guide will be provided
+### Phase 3 (shipped v0.3.0)
+- **Additive by default** — new `InspectorConfig` flags are off unless enabled; `Inspector(df).render()` unchanged for existing apps
+- Optional `drill=` and comparison/quality/builder features are documented in the [User Guide](user-guide.md)
 
 ### Phase 4-5
 - **Likely require new API patterns**
@@ -571,6 +529,6 @@ We welcome feedback! Please open an issue on [GitHub](https://github.com/eddieth
 
 ---
 
-**Last Updated**: December 2024  
-**Version**: 0.3.0 → 1.0.0 Roadmap
+**Last Updated**: May 2026  
+**Version targets**: Phase 3 delivered **v0.3.0**; Phases **1→2→4→5** use **target v0.4.0 → v0.5.0 → v0.6.0 → v1.0.0** (illustrative)
 

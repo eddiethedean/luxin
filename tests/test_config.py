@@ -13,6 +13,13 @@ def test_inspector_config_defaults():
     assert config.detail_page_size == 100
     assert config.table_height == 400
     assert config.detail_height == 300
+    assert config.enable_multi_level_drill is False
+    assert config.max_drill_depth == 8
+    assert config.show_data_quality is False
+    assert config.show_aggregation_builder is False
+    assert config.compare_run_significance is False
+    assert config.show_comparison_entrypoint is False
+    assert config.inspector_session_key is None
 
 
 def test_inspector_config_custom():

@@ -6,12 +6,14 @@ Complete API documentation for Luxin.
 
 The main class for interactive data exploration.
 
-### `Inspector(df: pd.DataFrame)`
+### `Inspector(df, *, config=None, drill=None)`
 
 Initialize the Inspector with a DataFrame.
 
 **Parameters:**
 - `df` (pd.DataFrame): The DataFrame to inspect. Can be a regular pandas DataFrame or a TrackedDataFrame with aggregation tracking.
+- `config` (`InspectorConfig`, optional): UI / feature flags (Phase 3 adds drill, quality, builder, and comparison-related toggles).
+- `drill` (`DrillHierarchySpec`, optional): Declarative multi-level drill when `InspectorConfig.enable_multi_level_drill` is `True`.
 
 **Example:**
 ```python
@@ -36,6 +38,43 @@ Render the interactive drill-down interface in Streamlit.
 inspector = Inspector(agg_df)
 inspector.render()  # Must be called within Streamlit app context
 ```
+
+## InspectorConfig
+
+Defined in **`luxin.config`** (import `InspectorConfig`, `get_default_config`).
+
+**Typical usage:**
+```python
+from luxin import Inspector
+from luxin.config import InspectorConfig
+
+inspector = Inspector(agg, config=InspectorConfig(show_filters=True))
+```
+
+**Core UI fields** (defaults favor the standard drill-down experience):
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `show_summary_stats` | `True` | Expander with `describe()` on the aggregate |
+| `show_export_buttons` | `True` | Export controls |
+| `show_filters` | `True` | Column filters on the displayed aggregate |
+| `detail_page_size` | `100` | Detail panel pagination |
+| `table_height` | `400` | Main table height (px) |
+| `detail_height` | `300` | Detail dataframe height (px) |
+
+**Phase 3 (v0.3.0) fields** — all default to off unless noted:
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `enable_multi_level_drill` | `False` | Use `render_drill_stack_view` when `Inspector(..., drill=DrillHierarchySpec(...))` is set |
+| `max_drill_depth` | `8` | Cap on stacked drill depth (with `DrillHierarchySpec.max_depth`) |
+| `show_data_quality` | `False` | Quality / outlier expander next to detail rows |
+| `show_aggregation_builder` | `False` | Footer expander to rebuild aggregation from the root `_source_df` snapshot |
+| `show_comparison_entrypoint` | `False` | Expander with snippet for `luxin.compare.inspect_pair` |
+| `compare_run_significance` | `False` | Welch t-tests in comparison UI when SciPy is installed (`luxin[compare]`) |
+| `inspector_session_key` | `None` | Optional stable string for `luxin_agg_override_*` / widget keys (else `hex(id(inspector))`) |
+
+**Methods:** `to_dict()`, `from_dict(...)`, and module helper `get_default_config()`.
 
 ## TrackedDataFrame
 
@@ -136,4 +175,26 @@ Render a detail panel showing individual rows.
 - `detail_rows` (pd.DataFrame): DataFrame containing the detail rows to display
 - `title` (str): Title for the detail panel (default: "Detail Rows")
 - `height` (int): Height of the dataframe display in pixels (default: 300)
+
+## DrillHierarchySpec
+
+Defined in `luxin.drill_hierarchy` and exported as `luxin.DrillHierarchySpec`.
+
+**Fields:** `session_key`, `max_depth`, `level_labels`, plus either `next_level` (`Callable[[tuple, pd.DataFrame], TrackedDataFrame]`) and/or `children_by_parent_key` mapping normalized parent keys to precomputed `TrackedDataFrame` aggregations.
+
+## Comparison helpers
+
+### `luxin.compare.inspect_pair`
+
+```python
+from luxin.compare import inspect_pair
+
+inspect_pair(left_agg, right_agg, join_keys=["region"], config=inspector.config)
+```
+
+Renders two tables, a joined diff with `_left/_right/_delta/_pct_change` columns, and optional significance tests when `compare_run_significance=True` and SciPy is available (`pip install 'luxin[compare]'`).
+
+### Package exports (`luxin`)
+
+Stable symbols from **`luxin`** include: **`Inspector`**, **`TrackedDataFrame`**, **`DrillHierarchySpec`**, **`create_drill_table`**, Polars helpers (`create_tracked_from_polars`, `convert_polars_to_pandas`, `is_polars_dataframe`). Prefer **`InspectorConfig`** from **`luxin.config`**.
 

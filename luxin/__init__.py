@@ -4,6 +4,7 @@ Luxin - Streamlit-first interactive data exploration with drill-down capabilitie
 
 from luxin.inspector import Inspector
 from luxin.tracked_df import TrackedDataFrame
+from luxin.drill_hierarchy import DrillHierarchySpec
 from luxin.drill_table import create_drill_table
 from luxin.polars_support import (
     create_tracked_from_polars,
@@ -12,10 +13,11 @@ from luxin.polars_support import (
 )
 import warnings
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 __all__ = [
     "Inspector",
     "TrackedDataFrame",
+    "DrillHierarchySpec",
     "create_drill_table",
     "create_tracked_from_polars",
     "convert_polars_to_pandas",

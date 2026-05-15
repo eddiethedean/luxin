@@ -22,14 +22,20 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 * 🔍 **Interactive drill-down** - Click on aggregated rows to see source data instantly
 * 📊 **Streamlit-native UI** - Fully integrated with Streamlit's native widgets
 * 🐼 **Pandas support** - Works seamlessly with pandas DataFrames
-* 🎯 **Automatic tracking** - TrackedDataFrame automatically tracks source rows during aggregations
-* 🚀 **Zero-config** - Get started with minimal setup
+* 🎯 **Automatic tracking** — `TrackedDataFrame` tracks source rows through `groupby().agg()`
+* 🚀 **Zero-config** — sensible defaults for a working drill-down table
+* 🦀 **Polars support** — optional `luxin[polars]` converters
+* 🧭 **Phase 3 (v0.3.0)** — optional multi-level drill, `luxin.compare`, data-quality panel, aggregation builder (`InspectorConfig` flags; see [User Guide](user-guide.md))
 
 ## Installation
 
 ```bash
 pip install luxin
 ```
+
+Optional: `pip install luxin[polars]` · `pip install luxin[compare]` (SciPy for comparison significance tests).
+
+**Streamlit**: use **>= 1.35** so interactive row selection works (see [Troubleshooting](troubleshooting.md)).
 
 ## Quick Start
 

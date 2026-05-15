@@ -94,13 +94,56 @@ inspector = Inspector(agg)
 inspector.render()
 ```
 
+### Phase 3 — multi-level drill-down (v0.3.0)
+
+Stack additional aggregations by passing a `DrillHierarchySpec` and enabling the feature flag:
+
+```python
+from luxin import Inspector, TrackedDataFrame, DrillHierarchySpec
+from luxin.config import InspectorConfig
+
+config = InspectorConfig(enable_multi_level_drill=True, max_drill_depth=4)
+
+def drill_region(region_key, rows):
+    tracked = TrackedDataFrame(rows)
+    return tracked.groupby("product").agg({"value": "sum"})
+
+spec = DrillHierarchySpec(
+    session_key="demo_sales",
+    max_depth=4,
+    level_labels=["Region", "Product"],
+    next_level=lambda key, rows: drill_region(key, rows),
+)
+
+df = TrackedDataFrame(
+    {
+        "region": ["N", "N", "S"],
+        "product": ["A", "B", "A"],
+        "value": [10, 20, 30],
+    }
+)
+root = df.groupby("region").agg({"value": "sum"})
+Inspector(root, config=config, drill=spec).render()
+```
+
+Breadcrumbs let you jump back to any ancestor slice. Session keys are namespaced (`luxin_drill_stack_{session_key}`) to avoid collisions across inspectors.
+
+### Phase 3 — data quality, comparison, aggregation builder (v0.3.0)
+
+- **`show_data_quality`** — adds a metrics / outlier-focused expander beside the detail pane.
+- **`show_comparison_entrypoint`** — shows a small snippet pointing at `luxin.compare.inspect_pair`.
+- **`show_aggregation_builder`** — footer expander builds a new aggregation from the snapshot of the original `_source_df` gathered at `Inspector` construction; results override the main table until cleared.
+- **`compare_run_significance`** — when true and SciPy is installed (`pip install 'luxin[compare]'`), comparison mode can run Welch-style t-tests across aligned numeric columns.
+
 ## UI Components
 
 The Inspector interface includes:
 
-- **Main Table** - Displays aggregated data with row selection
-- **Detail Panel** - Shows underlying detail rows when a row is selected
-- **Summary Statistics** - Expandable section with descriptive statistics
+- **Main table** — Aggregated rows with interactive selection (**Streamlit 1.35+**)
+- **Detail panel** — Rows that rolled up into the selected aggregate
+- **Summary statistics** — Optional expander with `describe()` on the aggregate
+- **Filters & export** — When enabled in `InspectorConfig`
+- **Phase 3 (optional)** — Breadcrumb drill stack; data-quality expander beside details; footer **Build aggregation**; API hint expander for `luxin.compare`
 
 ## Tips and Best Practices
 

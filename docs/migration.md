@@ -1,10 +1,10 @@
 # Migration Guide
 
-Guide for migrating from the old luxin API (v0.1.0) to the new API (v0.2.0+).
+Guide for migrating from legacy Luxin APIs to the **`Inspector`** API (stable since **v0.2.0**) and adopting **v0.3.0** optional features where useful.
 
 ## Overview
 
-Luxin v0.2.0 introduced a new `Inspector` API pattern, similar to lavendertown. The old API is still supported but deprecated.
+Luxin **v0.2.0** introduced the `Inspector` API pattern, similar to lavendertown. The old APIs are still present but deprecated. **v0.3.0** adds optional Phase 3 features (`DrillHierarchySpec`, comparison, quality, aggregation builder)—see below and the [User Guide](user-guide.md).
 
 ## Key Changes
 
@@ -87,12 +87,13 @@ create_drill_table(agg_df, detail_df, groupby_cols=['category'])
 ### Configuration Options
 
 ```python
-from luxin import Inspector, InspectorConfig
+from luxin import Inspector
+from luxin.config import InspectorConfig
 
 config = InspectorConfig(
     show_summary_stats=False,
     show_export_buttons=True,
-    detail_page_size=50
+    detail_page_size=50,
 )
 inspector = Inspector(agg, config=config)
 inspector.render()
@@ -173,11 +174,19 @@ agg = df.groupby('category').agg({'value': ['sum', 'mean']})
 Inspector(agg).render()
 ```
 
+## New in v0.3.0 (optional)
+
+These are **additive**: defaults keep `Inspector(agg).render()` behavior unchanged.
+
+- **`DrillHierarchySpec` + `enable_multi_level_drill`** — stacked aggregations with breadcrumbs (`from luxin import DrillHierarchySpec`; config from `luxin.config`).
+- **`luxin.compare.inspect_pair`** — compare two aggregates side-by-side; install **`luxin[compare]`** for optional SciPy t-tests with `compare_run_significance=True`.
+- **`show_data_quality`**, **`show_aggregation_builder`**, **`show_comparison_entrypoint`** — see [User Guide](user-guide.md) and [API Reference](api-reference.md).
+
 ## Timeline
 
-- **v0.2.0**: New API introduced, old API deprecated with warnings
-- **v0.2.1**: Streamlit 1.35+ required for dataframe selection; normalized drill-down keys; clearer warnings for incomplete tracking; see [CHANGELOG.md](../CHANGELOG.md)
-- **v0.3.0** (planned): Old API removed, only Inspector API supported
+- **v0.2.0**: `Inspector` API introduced; `show_drill_table` / legacy patterns deprecated with warnings
+- **v0.2.1**: Streamlit **1.35+** required for dataframe row selection; normalized drill-down keys; clearer warnings for incomplete tracking; see [CHANGELOG.md](../CHANGELOG.md)
+- **v0.3.0**: Phase 3 optional features (multi-level drill, comparison, quality, aggregation builder); legacy APIs still present with deprecation warnings (removal is a future major version concern, not tied to 0.3.0)
 
 ## Need Help?
 
