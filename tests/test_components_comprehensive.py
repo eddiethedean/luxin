@@ -1,6 +1,5 @@
 """Comprehensive tests for UI components with edge cases."""
 
-import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from luxin.components.table_view import render_table_view, _show_row_details
@@ -10,8 +9,10 @@ from luxin.config import InspectorConfig
 
 def test_render_table_view_with_config():
     """Test render_table_view with custom configuration."""
-    agg_df = pd.DataFrame({'value': [30, 70]})
-    agg_df.index = ['A', 'B']
+    agg_df = pd.DataFrame(
+        {'value': [30, 70]},
+        index=pd.Index(['A', 'B'], name='category'),
+    )
     detail_df = pd.DataFrame({'category': ['A', 'A', 'B', 'B'], 'value': [10, 20, 30, 40]})
     source_mapping = {('A',): [0, 1], ('B',): [2, 3]}
     groupby_cols = ['category']
@@ -33,8 +34,10 @@ def test_render_table_view_with_config():
 
 def test_render_table_view_with_selection():
     """Test render_table_view with row selection."""
-    agg_df = pd.DataFrame({'value': [30, 70]})
-    agg_df.index = ['A', 'B']
+    agg_df = pd.DataFrame(
+        {'value': [30, 70]},
+        index=pd.Index(['A', 'B'], name='category'),
+    )
     detail_df = pd.DataFrame({'category': ['A', 'A', 'B', 'B'], 'value': [10, 20, 30, 40]})
     source_mapping = {('A',): [0, 1], ('B',): [2, 3]}
     groupby_cols = ['category']
@@ -62,8 +65,10 @@ def test_render_table_view_large_dataset():
     # Create larger dataset
     data = {'category': ['A'] * 100 + ['B'] * 100, 'value': range(200)}
     detail_df = pd.DataFrame(data)
-    agg_df = pd.DataFrame({'value': [sum(range(100)), sum(range(100, 200))]})
-    agg_df.index = ['A', 'B']
+    agg_df = pd.DataFrame(
+        {'value': [sum(range(100)), sum(range(100, 200))]},
+        index=pd.Index(['A', 'B'], name='category'),
+    )
     source_mapping = {('A',): list(range(100)), ('B',): list(range(100, 200))}
     groupby_cols = ['category']
     
@@ -113,8 +118,8 @@ def test_detail_panel_no_pagination():
         mock_st.number_input.assert_not_called()
 
 
-def test_show_row_details_invalid_index():
-    """Test _show_row_details with invalid index."""
+def test_show_row_details_unknown_key():
+    """Test _show_row_details when the row key has no mapping entry."""
     agg_df = pd.DataFrame({'value': [30]})
     agg_df.index = ['A']
     detail_df = pd.DataFrame({'category': ['A'], 'value': [10]})
@@ -134,12 +139,8 @@ def test_show_row_details_invalid_index():
         from luxin.config import get_default_config
         config = get_default_config()
         
-        # Index out of range - should handle gracefully
-        try:
-            _show_row_details(99, agg_df, detail_df, source_mapping, groupby_cols, mock_col, config)
-        except (IndexError, KeyError):
-            # Expected to handle gracefully or raise appropriate error
-            pass
+        _show_row_details(('Z',), agg_df, detail_df, source_mapping, groupby_cols, mock_col, config)
+        mock_st.warning.assert_called()
 
 
 def test_show_row_details_multiindex():
@@ -163,9 +164,8 @@ def test_show_row_details_multiindex():
         from luxin.config import get_default_config
         config = get_default_config()
         
-        # Mock render_detail_panel since it's called inside
-        with patch('luxin.components.detail_panel.render_detail_panel') as mock_panel:
-            _show_row_details(0, agg_df, detail_df, source_mapping, groupby_cols, mock_col, config)
+        with patch('luxin.components.table_view.render_detail_panel') as mock_panel:
+            _show_row_details(('A', 'X'), agg_df, detail_df, source_mapping, groupby_cols, mock_col, config)
             
             # Should handle MultiIndex via render_detail_panel
             mock_panel.assert_called()

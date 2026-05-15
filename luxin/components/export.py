@@ -4,7 +4,6 @@ Export functionality for DataFrames.
 
 import pandas as pd
 import streamlit as st
-from typing import Optional
 import io
 
 
@@ -45,7 +44,6 @@ def render_export_buttons(df: pd.DataFrame, filename_prefix: str = "data") -> No
     with col3:
         # Excel export (if openpyxl is available)
         try:
-            import openpyxl
             excel_buffer = io.BytesIO()
             with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
                 df.to_excel(writer, index=False, sheet_name='Data')

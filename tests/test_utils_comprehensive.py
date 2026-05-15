@@ -2,7 +2,6 @@
 Comprehensive tests for utility functions.
 """
 
-import pytest
 import pandas as pd
 from luxin.utils import get_cached_index_mapping, optimize_source_mapping, chunk_dataframe
 

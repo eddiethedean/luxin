@@ -35,6 +35,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+streamlit = []
 polars = ["polars>=0.20.0"]
 dev = [
     "pytest>=7.0.0",

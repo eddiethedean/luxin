@@ -1,6 +1,5 @@
 """Tests for filtering component."""
 
-import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from luxin.components.filters import render_filters
@@ -124,8 +123,8 @@ def test_render_filters_custom_key_prefix():
         mock_st.slider = MagicMock(return_value=(10, 30))
         mock_st.caption = MagicMock()
         
-        result = render_filters(df, key_prefix="custom")
-        
+        render_filters(df, key_prefix="custom")
+
         # Should use custom prefix in key
         mock_st.text_input.assert_called()
         call_kwargs = mock_st.text_input.call_args[1]

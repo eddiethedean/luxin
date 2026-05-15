@@ -1,7 +1,5 @@
 """Integration tests for full workflow."""
 
-import pytest
-import pandas as pd
 from unittest.mock import patch
 from luxin import Inspector, TrackedDataFrame
 

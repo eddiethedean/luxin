@@ -2,7 +2,6 @@
 Comprehensive tests for detail_panel component, including pagination edge cases.
 """
 
-import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from luxin.components.detail_panel import render_detail_panel
@@ -62,7 +61,6 @@ def test_detail_panel_pagination_next_button(mock_st):
     
     # Test next button when not on last page
     mock_st.button.return_value = True
-    total_pages = (len(df) + 100 - 1) // 100
     mock_st.session_state["detail_page_123"] = 1
     
     render_detail_panel(df, page_size=100)

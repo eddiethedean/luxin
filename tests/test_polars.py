@@ -2,7 +2,6 @@
 
 import pytest
 import pandas as pd
-from unittest.mock import patch
 from luxin.polars_support import (
     convert_polars_to_pandas,
     create_tracked_from_polars,

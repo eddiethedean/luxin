@@ -13,7 +13,7 @@ def test_deprecated_show_drill_table_import():
         warnings.simplefilter("always")
         # Import to trigger __getattr__
         import luxin
-        show_drill_table = luxin.show_drill_table  # This triggers __getattr__
+        _ = luxin.show_drill_table  # triggers __getattr__
         
         assert len(w) >= 1
         deprecation_warnings = [warning for warning in w if issubclass(warning.category, DeprecationWarning)]
@@ -32,9 +32,6 @@ def test_getattr_with_invalid_name():
 def test_all_exports():
     """Test that all expected exports are available."""
     from luxin import (
-        Inspector,
-        TrackedDataFrame,
-        create_drill_table,
         create_tracked_from_polars,
         convert_polars_to_pandas,
         is_polars_dataframe

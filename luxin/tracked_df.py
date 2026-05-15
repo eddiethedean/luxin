@@ -4,7 +4,6 @@ TrackedDataFrame - A pandas DataFrame subclass that tracks source rows during ag
 
 import pandas as pd
 from typing import Any, Dict, List, Optional
-import uuid
 
 
 class TrackedDataFrame(pd.DataFrame):

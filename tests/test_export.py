@@ -1,6 +1,5 @@
 """Tests for export functionality."""
 
-import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from luxin.components.export import render_export_buttons
@@ -72,17 +71,9 @@ def test_render_export_buttons_excel_without_openpyxl():
         mock_st.download_button = MagicMock()
         mock_st.info = MagicMock()
         
-        # Check if openpyxl is actually available
-        try:
-            import openpyxl
-            # If available, Excel button will be shown, so just verify function runs
-            render_export_buttons(df)
-            assert mock_st.download_button.call_count >= 2  # CSV and JSON at minimum
-        except ImportError:
-            # If not available, should show info message
-            render_export_buttons(df)
-            # Function should still work and show CSV/JSON buttons
-            assert mock_st.download_button.call_count >= 2
+        # Runs whether or not optional openpyxl is installed
+        render_export_buttons(df)
+        assert mock_st.download_button.call_count >= 2  # CSV and JSON at minimum
 
 
 def test_render_export_buttons_custom_filename():

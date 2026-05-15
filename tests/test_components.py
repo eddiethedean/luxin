@@ -1,6 +1,5 @@
 """Tests for UI components."""
 
-import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from luxin.components.table_view import render_table_view, _show_row_details
@@ -129,8 +128,8 @@ def test_show_row_details():
         config = get_default_config()
         
         # Mock render_detail_panel since it's called inside
-        with patch('luxin.components.detail_panel.render_detail_panel') as mock_panel:
-            _show_row_details(0, agg_df, detail_df, source_mapping, groupby_cols, mock_col, config)
+        with patch('luxin.components.table_view.render_detail_panel') as mock_panel:
+            _show_row_details(('A',), agg_df, detail_df, source_mapping, groupby_cols, mock_col, config)
             
             # Should show detail rows via render_detail_panel
             mock_st.subheader.assert_called()
@@ -152,7 +151,7 @@ def test_show_row_details_no_mapping():
         mock_st.subheader = MagicMock()
         mock_st.warning = MagicMock()
         
-        _show_row_details(0, agg_df, detail_df, source_mapping, groupby_cols, mock_col)
+        _show_row_details(('A',), agg_df, detail_df, source_mapping, groupby_cols, mock_col)
         
         # Should show warning
         mock_st.warning.assert_called()

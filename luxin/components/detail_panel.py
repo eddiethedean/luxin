@@ -4,7 +4,6 @@ Detail panel component for displaying individual row details.
 
 import pandas as pd
 import streamlit as st
-from typing import List, Optional
 
 
 def render_detail_panel(

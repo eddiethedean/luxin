@@ -1,6 +1,5 @@
 """Tests for manual API functions."""
 
-import pytest
 import pandas as pd
 from luxin.drill_table import _build_source_mapping
 

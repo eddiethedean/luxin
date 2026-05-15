@@ -3,7 +3,7 @@ Manual API for creating drill-down tables from existing DataFrames.
 """
 
 import pandas as pd
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from luxin.validation import (
     validate_dataframe, 
     validate_groupby_cols, 

@@ -32,8 +32,8 @@
             // Add selected class to clicked row
             this.classList.add('selected');
             
-            // Get the row key based on index values
-            const rowKey = getRowKey(index);
+            // Get the row key from embedded data or legacy mapping order
+            const rowKey = getRowKey(this, index);
             
             // Show detail panel with data
             showDetailPanel(rowKey);
@@ -54,9 +54,13 @@
         }
     });
     
-    function getRowKey(rowIndex) {
-        // Get the row key from the data
-        const keys = Object.keys(sourceMapping);
+    // Row key is embedded per-row (fallback for older markup)
+    function getRowKey(rowElement, rowIndex) {
+        var attrKey = rowElement.getAttribute('data-luxin-key');
+        if (attrKey) {
+            return attrKey;
+        }
+        var keys = Object.keys(sourceMapping);
         if (rowIndex < keys.length) {
             return keys[rowIndex];
         }

@@ -1,6 +1,5 @@
 """Tests for utility functions."""
 
-import pytest
 import pandas as pd
 from luxin.utils import optimize_source_mapping, chunk_dataframe
 

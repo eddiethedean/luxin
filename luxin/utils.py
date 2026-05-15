@@ -3,33 +3,35 @@ Utility functions for performance optimization and common operations.
 """
 
 import pandas as pd
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from functools import lru_cache
 
 
 @lru_cache(maxsize=128)
 def get_cached_index_mapping(df_index: tuple) -> Dict[Any, int]:
     """
-    Cache index to position mapping for faster lookups.
-    
+    Map tuple index entries to positional indices (LRU cached).
+
+    ``df_index`` should be tuple(index) ordered as in iteration (e.g. ``tuple(df.index)``).
+
     Args:
-        df_index: Tuple representation of DataFrame index
-        
+        df_index: Tuple representation of ordered index labels.
+
     Returns:
-        Dictionary mapping index values to positions
+        Dictionary mapping each label to its first position in ``df_index``.
     """
-    # This is a placeholder for caching index lookups
-    # In practice, we'd convert the index to a hashable format
-    return {}
+    return {label: pos for pos, label in enumerate(df_index)}
 
 
-def optimize_source_mapping(source_mapping: Dict[Any, List[int]]) -> Dict[Any, List[int]]:
+def optimize_source_mapping(
+    source_mapping: Dict[Any, List[int]],
+) -> Dict[Any, List[int]]:
     """
     Optimize source mapping by ensuring indices are sorted and unique.
-    
+
     Args:
         source_mapping: Original source mapping
-        
+
     Returns:
         Optimized source mapping with sorted, unique indices
     """
@@ -43,16 +45,15 @@ def optimize_source_mapping(source_mapping: Dict[Any, List[int]]) -> Dict[Any, L
 def chunk_dataframe(df: pd.DataFrame, chunk_size: int = 1000) -> List[pd.DataFrame]:
     """
     Split DataFrame into chunks for lazy loading.
-    
+
     Args:
         df: DataFrame to chunk
         chunk_size: Size of each chunk
-        
+
     Returns:
         List of DataFrame chunks
     """
     chunks = []
     for i in range(0, len(df), chunk_size):
-        chunks.append(df.iloc[i:i + chunk_size])
+        chunks.append(df.iloc[i : i + chunk_size])
     return chunks
-

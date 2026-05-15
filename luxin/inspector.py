@@ -3,8 +3,8 @@ Inspector - Main class for interactive data exploration with drill-down capabili
 """
 
 import pandas as pd
-from typing import Optional, Dict, Any, List, Union
 import streamlit as st
+from typing import Optional, Dict, Any, List, Union
 from luxin.polars_support import handle_polars_in_inspector, is_polars_dataframe
 from luxin.config import InspectorConfig, get_default_config
 from luxin.validation import validate_dataframe, ValidationError
@@ -69,15 +69,6 @@ class Inspector:
         It will display the aggregated data (if available) or the
         source data, with interactive drill-down capabilities.
         """
-        try:
-            import streamlit as st
-        except ImportError:
-            raise ImportError(
-                "Streamlit is required for Inspector.render().\n"
-                "Install with: pip install streamlit\n"
-                "Or install luxin with Streamlit: pip install luxin[streamlit]"
-            ) from None
-        
         if self._is_aggregated and self._source_df is not None:
             # Display aggregated view with drill-down
             from luxin.components.table_view import render_table_view

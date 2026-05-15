@@ -2,7 +2,6 @@
 Comprehensive tests for export functionality, including error cases.
 """
 
-import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from luxin.components.export import render_export_buttons
