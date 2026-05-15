@@ -62,14 +62,9 @@ def render_aggregation_builder(
         return None
 
     grp_opts = _infer_groupby_candidates(source_df)
-
-    gb_cols = st.multiselect(
-        "Group-by columns",
-        options=grp_opts,
-        default=grp_opts[:1],
-        key=f"luxin_agg_gb_{session_key_suffix}",
-        max_selections=min(max_groupby_cols, len(grp_opts)),
-    )
+    if not grp_opts:
+        st.warning("No suitable group-by column candidates found in this frame.")
+        return None
 
     tmpl = st.selectbox(
         "Template",
@@ -77,7 +72,22 @@ def render_aggregation_builder(
         key=f"luxin_agg_tmpl_{session_key_suffix}",
     )
 
-    vals = _numeric_value_candidates(source_df, gb_cols)
+    gb_cols: List[str] = []
+
+    if tmpl == "(manual)":
+        gb_cols = st.multiselect(
+            "Group-by columns",
+            options=grp_opts,
+            default=grp_opts[:1] if grp_opts else [],
+            key=f"luxin_agg_gb_{session_key_suffix}",
+            max_selections=min(max_groupby_cols, len(grp_opts)) if grp_opts else 4,
+        )
+    else:
+        st.caption(
+            "Group-by columns are fixed by the template. "
+            "Choose **(manual)** above to select group-by columns yourself."
+        )
+
     agg_spec: Dict[str, str] = {}
 
     if tmpl != "(manual)":
@@ -87,17 +97,26 @@ def render_aggregation_builder(
     if tmpl == "starter_sum_numerics":
         gb_cols = grp_opts[:1]
         agg_spec = {c: "sum" for c in _numeric_value_candidates(source_df, gb_cols)}
-        st.caption("Template locked groupby/value reducers.")
+        st.caption(
+            f"Template uses group-by **{gb_cols!r}** and sums all numeric value columns."
+        )
 
     elif tmpl == "two_level_mean":
         gb_cols = grp_opts[: min(2, len(grp_opts))]
         agg_spec = {c: "mean" for c in _numeric_value_candidates(source_df, gb_cols)}
+        st.caption(
+            f"Template uses group-by **{gb_cols!r}** and means all numeric value columns."
+        )
 
     elif tmpl == "count_all_numerics":
         gb_cols = grp_opts[: min(2, len(grp_opts))]
         agg_spec = {c: "count" for c in _numeric_value_candidates(source_df, gb_cols)}
+        st.caption(
+            f"Template uses group-by **{gb_cols!r}** and counts all numeric value columns."
+        )
 
     elif tmpl == "(manual)":
+        vals = _numeric_value_candidates(source_df, gb_cols)
         vals_pick = st.multiselect(
             "Value columns (numeric)",
             options=vals,
@@ -114,7 +133,9 @@ def render_aggregation_builder(
             )
             agg_spec[vc] = choice
 
-    clicked = st.button("Apply aggregation", key=f"luxin_agg_apply_{session_key_suffix}")
+    clicked = st.button(
+        "Apply aggregation", key=f"luxin_agg_apply_{session_key_suffix}"
+    )
     if not clicked:
         return None
 
@@ -143,10 +164,14 @@ def render_footer_aggregation_builder(
 ) -> None:
     """Expander wrapping :func:`render_aggregation_builder` with success messaging."""
     with st.expander("🧱 Build aggregation", expanded=False):
-        if st.button("Clear custom aggregation", key=f"luxin_agg_clr_{session_key_suffix}"):
+        if st.button(
+            "Clear custom aggregation", key=f"luxin_agg_clr_{session_key_suffix}"
+        ):
             st.session_state.pop(f"luxin_agg_override_{session_key_suffix}", None)
             st.rerun()
-        rebuilt = render_aggregation_builder(source_df, session_key_suffix=session_key_suffix)
+        rebuilt = render_aggregation_builder(
+            source_df, session_key_suffix=session_key_suffix
+        )
         key = f"luxin_agg_override_{session_key_suffix}"
         if rebuilt is not None:
             st.session_state[key] = rebuilt

@@ -12,9 +12,11 @@ if TYPE_CHECKING:
     from luxin.tracked_df import TrackedDataFrame
 
 try:
-    import polars as pl_runtime
+    import polars as _pl
+
+    pl_runtime: Any = _pl
 except ImportError:
-    pl_runtime = None  # type: ignore[assignment, misc]
+    pl_runtime = None
 
 POLARS_AVAILABLE = pl_runtime is not None
 
@@ -35,7 +37,8 @@ def convert_polars_to_pandas(df: Union[pd.DataFrame, Any]) -> pd.DataFrame:
     if not POLARS_AVAILABLE:
         raise ImportError("Polars is not installed. Install with: pip install polars")
 
-    if isinstance(df, pl_runtime.DataFrame):  # type: ignore[attr-defined, union-attr]
+    assert pl_runtime is not None
+    if isinstance(df, pl_runtime.DataFrame):  # type: ignore[attr-defined]
         return df.to_pandas()
 
     raise TypeError(f"Expected Polars or pandas DataFrame, got {type(df)}")
@@ -73,6 +76,7 @@ def is_polars_dataframe(df: Any) -> bool:
     if not POLARS_AVAILABLE:
         return False
 
+    assert pl_runtime is not None
     return isinstance(df, pl_runtime.DataFrame)  # type: ignore[arg-type]
 
 

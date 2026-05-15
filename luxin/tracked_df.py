@@ -3,7 +3,7 @@ TrackedDataFrame - A pandas DataFrame subclass that tracks source rows during ag
 """
 
 import pandas as pd
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 
 def _normalize_groupby_columns(by) -> List[str]:
@@ -20,7 +20,11 @@ def _normalize_groupby_columns(by) -> List[str]:
         )
     if isinstance(by, str):
         cols = [by]
-    elif hasattr(by, "tolist") and callable(getattr(by, "tolist")) and not isinstance(by, (list, tuple)):  # type: ignore[unreachable]
+    elif (
+        hasattr(by, "tolist")
+        and callable(getattr(by, "tolist"))
+        and not isinstance(by, (list, tuple))
+    ):  # type: ignore[unreachable]
         cols = [x for x in by.tolist()]  # type: ignore[union-attr]
     elif isinstance(by, tuple):
         cols = list(by)
@@ -40,7 +44,7 @@ def _normalize_groupby_columns(by) -> List[str]:
         raise NotImplementedError(
             "TrackedDataFrame.groupby only supports grouping by column name strings."
         )
-    return cols
+    return cast(List[str], cols)
 
 
 class TrackedDataFrame(pd.DataFrame):
@@ -67,7 +71,7 @@ class TrackedDataFrame(pd.DataFrame):
     def _constructor(self):
         return TrackedDataFrame
 
-    def groupby(self, by=None, **kwargs):
+    def groupby(self, by=None, **kwargs):  # ty: ignore[invalid-method-override]
         """Override groupby to return a TrackedGroupBy object."""
         return TrackedGroupBy(self, by, **kwargs)
 
@@ -94,6 +98,10 @@ class TrackedDataFrame(pd.DataFrame):
             # Fallback to old display method if Inspector not available
             from luxin.display import display_drill_table
 
+            if self._source_df is None:
+                raise ValueError(
+                    "show_drill_table() requires aggregation metadata including `_source_df`."
+                )
             display_drill_table(
                 self, self._source_df, self._source_mapping, self._groupby_cols
             )

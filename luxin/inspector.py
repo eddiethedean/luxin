@@ -4,7 +4,7 @@ Inspector - Main class for interactive data exploration with drill-down capabili
 
 import pandas as pd
 import streamlit as st
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 
 from luxin.polars_support import handle_polars_in_inspector, is_polars_dataframe
 from luxin.config import InspectorConfig, get_default_config
@@ -149,7 +149,10 @@ class Inspector:
             return
 
         if self._is_aggregated and self._source_df is not None:
-            from luxin.components.table_view import render_drill_stack_view, render_table_view
+            from luxin.components.table_view import (
+                render_drill_stack_view,
+                render_table_view,
+            )
 
             drill_active = (
                 not override_active
@@ -158,10 +161,12 @@ class Inspector:
             )
 
             if drill_active:
-                render_drill_stack_view(effective_df, self.drill, config=self.config)
+                render_drill_stack_view(
+                    cast(pd.DataFrame, effective_df), self.drill, config=self.config
+                )
             else:
                 render_table_view(
-                    agg_df=effective_df,
+                    agg_df=cast(pd.DataFrame, effective_df),
                     detail_df=self._source_df,
                     source_mapping=self._source_mapping,
                     groupby_cols=self._groupby_cols,
@@ -172,7 +177,9 @@ class Inspector:
                 self.config.show_aggregation_builder
                 and self._aggregation_builder_source is not None
             ):
-                from luxin.components.aggregation_builder import render_footer_aggregation_builder
+                from luxin.components.aggregation_builder import (
+                    render_footer_aggregation_builder,
+                )
 
                 render_footer_aggregation_builder(
                     self._aggregation_builder_source,
@@ -191,4 +198,3 @@ class Inspector:
                 "inspector.render()\n"
                 "```"
             )
-

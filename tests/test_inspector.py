@@ -137,7 +137,9 @@ def test_inspector_render_multilevel_drill():
     agg = df.groupby("category").agg({"value": "sum"})
     spec = DrillHierarchySpec(
         session_key="unittest_drill",
-        next_level=lambda _k, rows: TrackedDataFrame(rows).groupby("category").agg({"value": "mean"}),
+        next_level=lambda _k, rows: (
+            TrackedDataFrame(rows).groupby("category").agg({"value": "mean"})
+        ),
     )
     config = InspectorConfig(enable_multi_level_drill=True)
 

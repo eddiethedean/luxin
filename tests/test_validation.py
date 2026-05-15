@@ -1,5 +1,7 @@
 """Tests for input validation."""
 
+from typing import Any, cast
+
 import pytest
 import pandas as pd
 from luxin.validation import (
@@ -77,7 +79,7 @@ def test_validate_groupby_cols_not_list():
     """Test validation with non-list input."""
     df = pd.DataFrame({"a": [1, 2, 3]})
     with pytest.raises(ValidationError):
-        validate_groupby_cols("a", df)
+        validate_groupby_cols(cast(Any, "a"), df)
 
 
 def test_validate_source_mapping_valid():
@@ -106,7 +108,7 @@ def test_validate_source_mapping_not_dict():
     detail_df = pd.DataFrame({"category": ["A"], "value": [10]})
 
     with pytest.raises(ValidationError, match="must be a dictionary"):
-        validate_source_mapping([], agg_df, detail_df)
+        validate_source_mapping(cast(Any, []), agg_df, detail_df)
 
 
 def test_validate_source_mapping_invalid_indices():
@@ -129,7 +131,7 @@ def test_validate_source_mapping_invalid_value_type():
     source_mapping = {("A",): "invalid"}
 
     with pytest.raises(ValidationError, match="must be lists"):
-        validate_source_mapping(source_mapping, agg_df, detail_df)
+        validate_source_mapping(cast(Any, source_mapping), agg_df, detail_df)
 
 
 def test_validate_aggregated_dataframe_valid():

@@ -128,6 +128,7 @@ def test_show_row_details():
                 groupby_cols,
                 mock_col,
                 config,
+                pagination_base_key="luxin_table_test",
             )
 
             mock_panel.assert_called()
@@ -149,7 +150,13 @@ def test_show_row_details_no_mapping():
         mock_st.warning = MagicMock()
 
         _show_row_details(
-            ("A",), agg_df, detail_df, source_mapping, groupby_cols, mock_col
+            ("A",),
+            agg_df,
+            detail_df,
+            source_mapping,
+            groupby_cols,
+            mock_col,
+            pagination_base_key="luxin_table_test",
         )
 
         # Should show warning

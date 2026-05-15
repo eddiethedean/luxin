@@ -43,7 +43,9 @@ class DrillLevelContext:
 def context_from_tracked(agg_df: Any, label: str = "Root") -> DrillLevelContext:
     """Build a context from an aggregated ``TrackedDataFrame``."""
     if not getattr(agg_df, "_is_aggregated", False):
-        raise ValueError("``context_from_tracked`` expects an aggregated TrackedDataFrame.")
+        raise ValueError(
+            "``context_from_tracked`` expects an aggregated TrackedDataFrame."
+        )
     raw_map = getattr(agg_df, "_source_mapping", {})
     if not isinstance(raw_map, dict):
         raw_map = {}
@@ -121,11 +123,21 @@ def stack_state_key(spec: DrillHierarchySpec) -> str:
     return f"luxin_drill_stack_{spec.session_key}"
 
 
-def clear_push_counters_for_depths(session_state: Any, spec: DrillHierarchySpec, depths: Sequence[int]) -> None:
-    for d in depths:
-        k = f"luxin_drill_last_push_{spec.session_key}_{int(d)}"
-        if k in session_state:
-            del session_state[k]
+def _clear_push_guards_from_depth(
+    session_state: Any, spec: DrillHierarchySpec, from_depth: int
+) -> None:
+    """Remove ``luxin_drill_last_push_<session>_<d>`` keys for all ``d >= from_depth``."""
+    prefix = f"luxin_drill_last_push_{spec.session_key}_"
+    for k in list(session_state.keys()):
+        if not isinstance(k, str) or not k.startswith(prefix):
+            continue
+        rest = k[len(prefix) :]
+        try:
+            depth = int(rest)
+        except ValueError:
+            continue
+        if depth >= from_depth:
+            session_state.pop(k, None)
 
 
 def truncate_stack(session_state: Any, spec: DrillHierarchySpec, new_len: int) -> None:
@@ -133,15 +145,16 @@ def truncate_stack(session_state: Any, spec: DrillHierarchySpec, new_len: int) -
     stack: List[DrillLevelContext] = list(session_state.get(key, []))
     if new_len <= 0:
         stack = []
+        _clear_push_guards_from_depth(session_state, spec, 0)
     elif new_len < len(stack):
         stack = stack[:new_len]
-        clear_push_counters_for_depths(
-            session_state, spec, range(max(0, new_len - 1), 64)
-        )
+        _clear_push_guards_from_depth(session_state, spec, max(0, new_len - 1))
     session_state[key] = stack
 
 
-def ensure_initial_stack(session_state: Any, spec: DrillHierarchySpec, root: Any) -> List[DrillLevelContext]:
+def ensure_initial_stack(
+    session_state: Any, spec: DrillHierarchySpec, root: Any
+) -> List[DrillLevelContext]:
     key = stack_state_key(spec)
     existing = session_state.get(key)
     if isinstance(existing, list) and existing:

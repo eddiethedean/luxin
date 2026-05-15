@@ -167,14 +167,16 @@ Render the main table view with drill-down capabilities.
 - `source_mapping` (Dict): Dictionary mapping aggregated row keys to detail row indices
 - `groupby_cols` (List[str]): List of column names used to group the data
 
-### `render_detail_panel(detail_rows, title, height)`
+### `render_detail_panel(detail_rows, title, height, page_size, pagination_session_key)`
 
-Render a detail panel showing individual rows.
+Render a detail panel showing individual rows (with pagination when ``len(detail_rows) > page_size``).
 
 **Parameters:**
 - `detail_rows` (pd.DataFrame): DataFrame containing the detail rows to display
 - `title` (str): Title for the detail panel (default: "Detail Rows")
 - `height` (int): Height of the dataframe display in pixels (default: 300)
+- `page_size` (int): Rows per page when paginating (default: 100)
+- `pagination_session_key` (str, optional): Stable Streamlit session/widget key prefix for pagination; if omitted, a hash of the frame contents is used
 
 ## DrillHierarchySpec
 

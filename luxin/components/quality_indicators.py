@@ -80,7 +80,9 @@ def flag_numeric_outliers(
             continue
         lower = q1 - 1.5 * iqr
         upper = q3 + 1.5 * iqr
-        m = ((series.astype(float) < lower) | (series.astype(float) > upper)).fillna(False)
+        m = ((series.astype(float) < lower) | (series.astype(float) > upper)).fillna(
+            False
+        )
         masks.append(m)
 
     if not masks:

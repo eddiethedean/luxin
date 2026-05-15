@@ -154,7 +154,14 @@ def test_show_row_details_unknown_key():
         config = get_default_config()
 
         _show_row_details(
-            ("Z",), agg_df, detail_df, source_mapping, groupby_cols, mock_col, config
+            ("Z",),
+            agg_df,
+            detail_df,
+            source_mapping,
+            groupby_cols,
+            mock_col,
+            config,
+            pagination_base_key="luxin_table_test",
         )
         mock_st.warning.assert_called()
 
@@ -190,6 +197,7 @@ def test_show_row_details_multiindex():
                 groupby_cols,
                 mock_col,
                 config,
+                pagination_base_key="luxin_table_test",
             )
 
             mock_panel.assert_called()

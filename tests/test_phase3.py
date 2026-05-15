@@ -15,7 +15,10 @@ from luxin.drill_hierarchy import (
     try_push_selected,
     truncate_stack,
 )
-from luxin.components.quality_indicators import compute_column_metrics, flag_numeric_outliers
+from luxin.components.quality_indicators import (
+    compute_column_metrics,
+    flag_numeric_outliers,
+)
 from luxin.utils import normalize_group_key
 
 
@@ -43,7 +46,9 @@ def test_drill_try_push_with_callback():
     assert len(new_stack) == 2
 
     stack_from_state = list(session_state[stack_state_key(spec)])
-    again = try_push_selected(session_state, stack_from_state, nk, spec, absolute_max_depth=6)
+    again = try_push_selected(
+        session_state, stack_from_state, nk, spec, absolute_max_depth=6
+    )
     assert len(again) == len(stack_from_state)
 
 
@@ -53,7 +58,9 @@ def test_drill_stack_truncation_clears_counters():
 
     spec = DrillHierarchySpec(
         session_key="t2",
-        next_level=lambda _k, rows: TrackedDataFrame(rows).assign(x=1).groupby("region").agg({"value": "mean"}),
+        next_level=lambda _k, rows: (
+            TrackedDataFrame(rows).assign(x=1).groupby("region").agg({"value": "mean"})
+        ),
     )
     session_state: dict = {}
     ensure_initial_stack(session_state, spec, root)
@@ -87,15 +94,16 @@ def test_quality_metrics_and_outliers():
 def test_quality_dashboard_streamlit_mock(monkeypatch):
     from luxin.components import quality_indicators as qi
 
-    monkeypatch.setattr(qi.st, "expander", MagicMock())
+    mock_expander = MagicMock()
+    expander_ctx = MagicMock()
+    expander_ctx.__enter__.return_value = None
+    expander_ctx.__exit__.return_value = None
+    mock_expander.return_value = expander_ctx
+
+    monkeypatch.setattr(qi.st, "expander", mock_expander)
     monkeypatch.setattr(qi.st, "dataframe", MagicMock())
     monkeypatch.setattr(qi.st, "success", MagicMock())
     monkeypatch.setattr(qi.st, "warning", MagicMock())
 
-    expander_ctx = MagicMock()
-    expander_ctx.__enter__.return_value = None
-    expander_ctx.__exit__.return_value = None
-    qi.st.expander.return_value = expander_ctx
-
     qi.render_quality_dashboard(pd.DataFrame({"x": [1, 2]}))
-    assert qi.st.expander.called
+    assert mock_expander.called

@@ -2,6 +2,8 @@
 Table view component for displaying aggregated data with drill-down.
 """
 
+import hashlib
+
 import pandas as pd
 import streamlit as st
 from typing import Any, Dict, List, Optional
@@ -21,6 +23,17 @@ from luxin._streamlit_compat import (
     dataframe_selection_guard_message,
     dataframe_selection_supported,
 )
+
+
+def _dataframe_selection_first_row(selected_rows: object) -> Optional[int]:
+    """Read first selected row index from ``st.dataframe`` selection API (Streamlit >= 1.35)."""
+    sel = getattr(selected_rows, "selection", None)
+    if sel is None:
+        return None
+    rows = getattr(sel, "rows", None)
+    if not rows:
+        return None
+    return int(rows[0])
 
 
 def _ensure_groupby_columns_in_frame(
@@ -139,21 +152,21 @@ def render_drill_stack_view(
         display_df = render_filters(display_df, key_prefix=filter_key)
 
     if len(display_df) > 0:
+        widget_table_key = f"luxin_table_{spec.session_key}_{len(stack)}"
         col1, col2 = st.columns([2, 1])
         with col1:
-            table_key = f"luxin_table_{spec.session_key}_{len(stack)}"
             selected_rows = st.dataframe(
                 display_df,
                 use_container_width=True,
                 height=config.table_height,
                 on_select="rerun",
                 selection_mode="single-row",
-                key=table_key,
+                key=widget_table_key,
             )
 
         row_key: Optional[tuple] = None
-        if selected_rows.selection.rows:  # type: ignore[attr-defined]
-            selected_row_num = selected_rows.selection.rows[0]  # type: ignore[attr-defined]
+        selected_row_num = _dataframe_selection_first_row(selected_rows)
+        if selected_row_num is not None:
             row_key = _resolve_row_key_from_selection(
                 display_df, selected_row_num, groupby_cols, agg_df
             )
@@ -174,6 +187,8 @@ def render_drill_stack_view(
             source_mapping = finalize_source_mapping(dict(current.source_mapping))
             groupby_cols = list(current.groupby_cols)
 
+        detail_pagination_base = f"luxin_table_{spec.session_key}_{len(stack)}"
+
         if row_key is not None:
             if len(stack) > old_len:
                 parent = stack[-2]
@@ -185,6 +200,7 @@ def render_drill_stack_view(
                     parent.groupby_cols,
                     col2,
                     config,
+                    pagination_base_key=detail_pagination_base,
                 )
             else:
                 _show_row_details(
@@ -195,6 +211,7 @@ def render_drill_stack_view(
                     groupby_cols,
                     col2,
                     config,
+                    pagination_base_key=detail_pagination_base,
                 )
         else:
             with col2:
@@ -261,6 +278,7 @@ def render_table_view(
     # Use clickable table rows with st.dataframe selection
     if len(display_df) > 0:
         # Create two columns: main table and detail panel
+        table_key = f"luxin_table_{id(agg_df)}"
         col1, col2 = st.columns([2, 1])
 
         with col1:
@@ -271,19 +289,26 @@ def render_table_view(
                 height=config.table_height,
                 on_select="rerun",
                 selection_mode="single-row",
-                key=f"luxin_table_{id(agg_df)}",
+                key=table_key,
             )
 
         row_key: Optional[tuple] = None
-        if selected_rows.selection.rows:  # type: ignore[attr-defined]
-            selected_row_num = selected_rows.selection.rows[0]  # type: ignore[attr-defined]
+        selected_row_num = _dataframe_selection_first_row(selected_rows)
+        if selected_row_num is not None:
             row_key = _resolve_row_key_from_selection(
                 display_df, selected_row_num, groupby_cols, agg_df
             )
 
         if row_key is not None:
             _show_row_details(
-                row_key, agg_df, detail_df, source_mapping, groupby_cols, col2, config
+                row_key,
+                agg_df,
+                detail_df,
+                source_mapping,
+                groupby_cols,
+                col2,
+                config,
+                pagination_base_key=table_key,
             )
         else:
             with col2:
@@ -314,6 +339,8 @@ def _show_row_details(
     groupby_cols: List[str],
     detail_col: Any,
     config: Optional[InspectorConfig] = None,
+    *,
+    pagination_base_key: Optional[str] = None,
 ) -> None:
     """
     Show detail rows for the selected aggregated row.
@@ -325,6 +352,7 @@ def _show_row_details(
         source_mapping: Dictionary mapping aggregated row keys to detail row indices
         groupby_cols: Column names used in the groupby operation
         detail_col: Streamlit column to render details in
+        pagination_base_key: Prefix for stable detail-pagination session keys (e.g. main table widget key)
     """
     with detail_col:
         nk = normalize_group_key(row_key)
@@ -351,6 +379,11 @@ def _show_row_details(
             title="Detail Rows",
             height=config.detail_height,
             page_size=config.detail_page_size,
+            pagination_session_key=(
+                f"{pagination_base_key}_d_{hashlib.sha256(repr(nk).encode()).hexdigest()[:16]}"
+                if pagination_base_key
+                else None
+            ),
         )
 
         if config.show_data_quality:

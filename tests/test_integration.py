@@ -89,7 +89,9 @@ def test_workflow_source_mapping_accuracy():
 
     # Verify detail rows match
     detail_indices_a = inspector._source_mapping[("A",)]
-    detail_rows_a = inspector._source_df.loc[detail_indices_a]
+    src = inspector._source_df
+    assert src is not None
+    detail_rows_a = src.loc[detail_indices_a]
     assert len(detail_rows_a) == 2
     assert detail_rows_a["value"].sum() == 30  # 10 + 20
 

@@ -44,7 +44,9 @@ def align_for_compare(
     return lf.reindex(union_index), rg.reindex(union_index)
 
 
-def build_diff_table(left: pd.DataFrame, right: pd.DataFrame, join_keys: Iterable[str]) -> pd.DataFrame:
+def build_diff_table(
+    left: pd.DataFrame, right: pd.DataFrame, join_keys: Iterable[str]
+) -> pd.DataFrame:
     """Wide diff view: shared numeric columns gain ``_left/_right/_delta/_pct_change`` fields."""
     jk = list(join_keys)
     lf, rg = align_for_compare(left, right, jk)
@@ -67,17 +69,28 @@ def build_diff_table(left: pd.DataFrame, right: pd.DataFrame, join_keys: Iterabl
         rser = rg[vc]
         parts[f"{vc}_left"] = lser
         parts[f"{vc}_right"] = rser
-        delta = rser.astype(float, copy=False).sub(lser.astype(float, copy=False), fill_value=float("nan"))
+        delta = rser.astype(float, copy=False).sub(
+            lser.astype(float, copy=False), fill_value=float("nan")
+        )
         parts[f"{vc}_delta"] = delta
         denom_ok = (lser != 0) & lser.notna()
         pct = pd.Series(float("nan"), index=lser.index)
-        pct.loc[denom_ok] = rser.astype(float)[denom_ok] / lser.astype(float)[denom_ok] - 1.0
+        pct.loc[denom_ok] = (
+            rser.astype(float)[denom_ok] / lser.astype(float)[denom_ok] - 1.0
+        )
         parts[f"{vc}_pct_change"] = pct
 
     return pd.DataFrame(parts)
 
 
 def _maybe_run_ttests(left: pd.DataFrame, right: pd.DataFrame, join_keys: List[str]):
+    """
+    Run Welch t-tests (SciPy) on each shared numeric column.
+
+    Rows are **not** matched by ``join_keys``: each test compares the distribution
+    of all non-null values in the left column to all non-null values in the right
+    column after alignment (exploratory only; use paired tests externally if needed).
+    """
     try:
         import scipy.stats  # noqa: WPS433
     except ImportError:
@@ -133,18 +146,33 @@ def render_comparison_views(
 
     with st.expander("Diff table (joined keys)"):
         try:
-            st.dataframe(build_diff_table(left_df, right_df, join_keys), use_container_width=True)
+            st.dataframe(
+                build_diff_table(left_df, right_df, join_keys), use_container_width=True
+            )
         except Exception as exc:  # noqa: BLE001
             st.error(f"Unable to build diff: {exc}")
 
     if cfg.compare_run_significance:
-        with st.expander("Optional significance checks (SciPy Welch t-test)", expanded=False):
+        with st.expander(
+            "Optional significance checks (SciPy Welch t-test)", expanded=False
+        ):
+            st.caption(
+                "Tests compare pooled column values (not row-paired by join key). "
+                "For paired aggregates, run hypothesis tests outside Luxin."
+            )
             tests = _maybe_run_ttests(left_df, right_df, list(join_keys))
             if not tests:
-                st.info("Install scipy extras: pip install 'luxin[compare]' for pairwise t-tests.")
+                st.info(
+                    "Install scipy extras: pip install 'luxin[compare]' for pairwise t-tests."
+                )
             else:
-                rows = [{"column": col, "statistic": res.statistic, "pvalue": res.pvalue} for col, res in tests.items()]
-                st.dataframe(pd.DataFrame(rows).set_index("column"), use_container_width=True)
+                rows = [
+                    {"column": col, "statistic": res.statistic, "pvalue": res.pvalue}
+                    for col, res in tests.items()
+                ]
+                st.dataframe(
+                    pd.DataFrame(rows).set_index("column"), use_container_width=True
+                )
 
 
 def inspect_pair(

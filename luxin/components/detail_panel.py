@@ -2,8 +2,24 @@
 Detail panel component for displaying individual row details.
 """
 
+from __future__ import annotations
+
+import hashlib
+from typing import Optional
+
 import pandas as pd
 import streamlit as st
+from pandas.util import hash_pandas_object
+
+
+def _fallback_pagination_session_key(detail_rows: pd.DataFrame) -> str:
+    """Stable key for pagination session state / widget keys (same data -> same key)."""
+    h = hashlib.sha256()
+    h.update(str(list(detail_rows.columns)).encode())
+    h.update(str(len(detail_rows)).encode())
+    if len(detail_rows) > 0:
+        h.update(hash_pandas_object(detail_rows, index=True).values.tobytes())
+    return f"detail_page_{h.hexdigest()[:24]}"
 
 
 def render_detail_panel(
@@ -11,6 +27,7 @@ def render_detail_panel(
     title: str = "Detail Rows",
     height: int = 300,
     page_size: int = 100,
+    pagination_session_key: Optional[str] = None,
 ) -> None:
     """
     Render a detail panel showing individual rows with pagination.
@@ -20,6 +37,8 @@ def render_detail_panel(
         title: Title for the detail panel
         height: Height of the dataframe display in pixels
         page_size: Number of rows per page (for pagination)
+        pagination_session_key: Stable key for Streamlit session state (pagination). If
+            omitted, a hash of the frame contents is used so reruns stay stable.
     """
     st.subheader(f"🔍 {title}")
     st.caption(f"Total: {len(detail_rows)} row(s)")
@@ -27,7 +46,9 @@ def render_detail_panel(
     # Add pagination for large datasets
     if len(detail_rows) > page_size:
         total_pages = (len(detail_rows) + page_size - 1) // page_size
-        page_key = f"detail_page_{id(detail_rows)}"
+        page_key = pagination_session_key or _fallback_pagination_session_key(
+            detail_rows
+        )
 
         if page_key not in st.session_state:
             st.session_state[page_key] = 1

@@ -27,7 +27,9 @@ def test_detect_environment_jupyter_via_ipython():
     ip_mod = MagicMock()
     ip_mod.get_ipython = MagicMock(return_value=MagicMock())
     with patch.dict(sys.modules, {"IPython": ip_mod}):
-        with patch("streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None):
+        with patch(
+            "streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None
+        ):
             assert _detect_environment() == "jupyter"
 
 
@@ -35,7 +37,9 @@ def test_detect_environment_unknown_without_ctx_or_ipython():
     ip_empty = MagicMock()
     ip_empty.get_ipython = MagicMock(return_value=None)
     with patch.dict(sys.modules, {"IPython": ip_empty}):
-        with patch("streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None):
+        with patch(
+            "streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None
+        ):
             assert _detect_environment() == "unknown"
 
 

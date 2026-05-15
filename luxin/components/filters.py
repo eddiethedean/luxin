@@ -42,8 +42,8 @@ def render_filters(df: pd.DataFrame, key_prefix: str = "luxin_filter") -> pd.Dat
     )
 
     if search_text:
-        # Search across all string columns
-        mask = pd.Series([False] * len(df))
+        # Align mask to df.index so text search works with non-RangeIndex frames
+        mask = pd.Series(False, index=df.index)
         for col in df.columns:
             mask |= df[col].astype(str).str.contains(search_text, case=False, na=False)
         filtered_df = filtered_df[mask]

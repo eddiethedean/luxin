@@ -38,7 +38,7 @@ def test_detail_panel_pagination_previous_button(mock_st):
     mock_st.button.return_value = True
     mock_st.session_state["detail_page_123"] = 2
 
-    render_detail_panel(df, page_size=100)
+    render_detail_panel(df, page_size=100, pagination_session_key="detail_page_123")
 
     # Verify button was called
     assert mock_st.button.called
@@ -75,7 +75,7 @@ def test_detail_panel_pagination_next_button(mock_st):
     mock_st.button.return_value = True
     mock_st.session_state["detail_page_123"] = 1
 
-    render_detail_panel(df, page_size=100)
+    render_detail_panel(df, page_size=100, pagination_session_key="detail_page_123")
 
     # Verify button was called
     assert mock_st.button.called
@@ -109,7 +109,16 @@ def test_detail_panel_pagination_number_input_change(mock_st):
     )
     mock_st.columns.return_value[2].__exit__ = MagicMock(return_value=None)
 
-    render_detail_panel(df, page_size=100)
+    render_detail_panel(df, page_size=100, pagination_session_key="detail_page_123")
 
     # Verify number_input was called with on_change
     assert mock_st.number_input.called
+
+
+def test_detail_panel_fallback_pagination_key_stable():
+    """Same frame content yields the same fallback pagination key across instances."""
+    from luxin.components.detail_panel import _fallback_pagination_session_key
+
+    a = pd.DataFrame({"x": [1, 2]}, index=[10, 20])
+    b = pd.DataFrame({"x": [1, 2]}, index=[10, 20])
+    assert _fallback_pagination_session_key(a) == _fallback_pagination_session_key(b)

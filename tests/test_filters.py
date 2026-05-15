@@ -45,6 +45,28 @@ def test_render_filters_text_search():
         assert result.iloc[0]["category"] == "Apple"
 
 
+def test_render_filters_text_search_non_range_index():
+    """Text search must not crash when the frame uses a non-RangeIndex (index alignment)."""
+    df = pd.DataFrame(
+        {"category": ["Apple", "Banana", "Cherry"], "value": [10, 20, 30]},
+        index=[100, 200, 300],
+    )
+
+    with patch("luxin.components.filters.st") as mock_st:
+        mock_st.text_input = MagicMock(return_value="App")
+        mock_expander = MagicMock()
+        mock_st.expander = MagicMock(return_value=mock_expander)
+        mock_st.multiselect = MagicMock(return_value=[])
+        mock_st.slider = MagicMock(return_value=(10, 30))
+        mock_st.caption = MagicMock()
+
+        result = render_filters(df)
+
+    assert len(result) == 1
+    assert result.index.tolist() == [100]
+    assert result.iloc[0]["category"] == "Apple"
+
+
 def test_render_filters_column_multiselect():
     """Test column multiselect filtering."""
     df = pd.DataFrame(
