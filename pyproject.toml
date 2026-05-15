@@ -30,7 +30,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Framework :: Streamlit",
     "Framework :: Jupyter",
 ]
 

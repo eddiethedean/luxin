@@ -45,3 +45,5 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+          # Attestations require Trusted Publishing (OIDC); token auth ignores them and logs noise.
+          attestations: false

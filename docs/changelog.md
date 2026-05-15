@@ -11,6 +11,7 @@ The canonical copy for GitHub and releases also lives at the repository root as 
 
 ### Fixed
 
+- **PyPI uploads**: drop invalid trove classifier `Framework :: Streamlit` (rejected by Warehouse with HTTP 400).
 - Require **Streamlit >= 1.35** for dataframe row selection (`on_select` / `selection_mode`); surface a clear upgrade error on older versions.
 - **Canonical `source_mapping` keys** so drill-down lookups work across numpy scalars, pandas timestamps, and mixed datetime representations.
 - **`Inspector.render`** warns when aggregation metadata is missing or empty instead of falling through to the non-drill tip.
