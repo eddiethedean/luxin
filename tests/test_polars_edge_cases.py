@@ -11,13 +11,20 @@ from unittest.mock import patch, MagicMock
 
 def test_convert_polars_to_pandas_no_polars_installed():
     """Test convert_polars_to_pandas when Polars is not installed."""
-    # Mock POLARS_AVAILABLE = False
     with patch("luxin.polars_support.POLARS_AVAILABLE", False):
         from luxin.polars_support import convert_polars_to_pandas
 
-        # Should raise ImportError for non-pandas DataFrame when Polars not available
+        # Type appears to be from polars.* → guide user to install the optional extra
+        class _FakePolarsFrame:
+            pass
+
+        _FakePolarsFrame.__module__ = "polars.dataframe.frame"
         with pytest.raises(ImportError, match="Polars is not installed"):
-            convert_polars_to_pandas(MagicMock())  # Mock non-pandas, non-polars object
+            convert_polars_to_pandas(_FakePolarsFrame())
+
+        # Generic non-pandas value → TypeError (not ImportError), same as invalid lists
+        with pytest.raises(TypeError, match="Expected Polars or pandas"):
+            convert_polars_to_pandas(MagicMock())
 
 
 def test_create_tracked_from_polars_no_polars_installed():
