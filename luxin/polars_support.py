@@ -34,13 +34,17 @@ def convert_polars_to_pandas(df: Union[pd.DataFrame, Any]) -> pd.DataFrame:
     if isinstance(df, pd.DataFrame):
         return df
 
-    if not POLARS_AVAILABLE:
+    if POLARS_AVAILABLE:
+        assert pl_runtime is not None
+        if isinstance(df, pl_runtime.DataFrame):  # type: ignore[attr-defined]
+            return df.to_pandas()
+        raise TypeError(f"Expected Polars or pandas DataFrame, got {type(df)}")
+
+    # Polars not installed: still reject junk with TypeError; ImportError only if it
+    # looks like a Polars frame (e.g. stub left from an optional extra environment).
+    mod = getattr(type(df), "__module__", "") or ""
+    if mod.startswith("polars"):
         raise ImportError("Polars is not installed. Install with: pip install polars")
-
-    assert pl_runtime is not None
-    if isinstance(df, pl_runtime.DataFrame):  # type: ignore[attr-defined]
-        return df.to_pandas()
-
     raise TypeError(f"Expected Polars or pandas DataFrame, got {type(df)}")
 
 
