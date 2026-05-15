@@ -6,7 +6,8 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+# Packaging output at repo root (dist, dist_build, dist-*, …)
+/dist*
 downloads/
 eggs/
 .eggs/

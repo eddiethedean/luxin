@@ -36,19 +36,35 @@ jobs:
           python -m pip install --upgrade pip
           pip install build twine
 
-      - name: Build sdist and wheels
+      - name: Build sdist and wheels (luxin-core, luxin-nb, luxin)
         run: |
+          set -euo pipefail
+          rm -rf dist
+          mkdir -p dist
           (cd luxin_core && python -m build --outdir ../dist)
           (cd luxin_nb && python -m build --outdir ../dist)
           python -m build --outdir dist
 
+      - name: List built artifacts
+        run: |
+          set -euo pipefail
+          ls -la dist/
+          echo "---"
+          echo "luxin-core:" && ls -1 dist/luxin_core-* || { echo "::error::No luxin-core artifacts"; exit 1; }
+          echo "luxin-nb:" && ls -1 dist/luxin_nb-* || { echo "::error::No luxin-nb artifacts"; exit 1; }
+          echo "luxin:" && ls -1 dist/luxin-[0-9]* || { echo "::error::No luxin metapackage artifacts"; exit 1; }
+
       - name: Check distributions
         run: twine check dist/*
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          # Attestations require Trusted Publishing (OIDC); token auth ignores them and logs noise.
-          attestations: false
+      - name: Publish to PyPI (luxin-core, then luxin-nb, then luxin)
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Upload in dependency order so each package exists before dependents resolve it.
+          twine upload dist/luxin_core-* --non-interactive
+          twine upload dist/luxin_nb-* --non-interactive
+          # Match luxin-X.Y.Z only (not luxin_core / luxin_nb)
+          twine upload dist/luxin-[0-9]* --non-interactive
