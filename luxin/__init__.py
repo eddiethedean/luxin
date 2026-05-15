@@ -13,7 +13,7 @@ from luxin.polars_support import (
 )
 import warnings
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __all__ = [
     "Inspector",
     "TrackedDataFrame",

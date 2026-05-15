@@ -11,7 +11,7 @@ from unittest.mock import patch, MagicMock
 
 def test_convert_polars_to_pandas_no_polars_installed():
     """Test convert_polars_to_pandas when Polars is not installed."""
-    with patch("luxin.polars_support.POLARS_AVAILABLE", False):
+    with patch("luxin_core.polars_support.POLARS_AVAILABLE", False):
         from luxin.polars_support import convert_polars_to_pandas
 
         # Type appears to be from polars.* → guide user to install the optional extra
@@ -29,7 +29,7 @@ def test_convert_polars_to_pandas_no_polars_installed():
 
 def test_create_tracked_from_polars_no_polars_installed():
     """Test create_tracked_from_polars when Polars is not installed."""
-    with patch("luxin.polars_support.POLARS_AVAILABLE", False):
+    with patch("luxin_core.polars_support.POLARS_AVAILABLE", False):
         from luxin.polars_support import create_tracked_from_polars
 
         with pytest.raises(ImportError, match="Polars is not installed"):
@@ -53,7 +53,7 @@ def test_convert_polars_to_pandas_invalid_type():
 
 def test_is_polars_dataframe_no_polars():
     """Test is_polars_dataframe when Polars is not installed."""
-    with patch("luxin.polars_support.POLARS_AVAILABLE", False):
+    with patch("luxin_core.polars_support.POLARS_AVAILABLE", False):
         from luxin.polars_support import is_polars_dataframe
 
         # Should return False when Polars not available

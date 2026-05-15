@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Sequence
 import pandas as pd
 import streamlit as st
 
-from luxin.tracked_df import TrackedDataFrame
+from luxin_core.tracked_df import TrackedDataFrame
 
 AggName = str
 

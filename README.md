@@ -32,6 +32,7 @@ pip install luxin
 Optional extras:
 
 ```bash
+pip install luxin[notebook]  # Jupyter/HTML drill-down (luxin-nb)
 pip install luxin[polars]    # Polars → pandas / TrackedDataFrame helpers
 pip install luxin[compare]   # SciPy for optional Welch t-tests in luxin.compare.inspect_pair
 ```
@@ -172,10 +173,10 @@ Full documentation: https://luxin.readthedocs.io/
 ## 🛠️ Development
 
 ```bash
-# Clone and install
+# Clone and install (monorepo: core + notebook package needed to run tests)
 git clone https://github.com/eddiethedean/luxin.git
 cd luxin
-pip install -e ".[dev]"
+pip install -e ./luxin_core -e ./luxin_nb -e ".[dev]"
 
 # Run tests (if global pytest plugins emit async-fixture errors on your machine):
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/

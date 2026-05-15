@@ -2,6 +2,4 @@ include README.md
 include CHANGELOG.md
 include LICENSE
 include pyproject.toml
-recursive-include luxin/static *.css *.js
-recursive-include luxin/templates *.html
 

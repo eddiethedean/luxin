@@ -36,7 +36,7 @@ def display_streamlit(
         ) from None
 
     from luxin.components.table_view import render_table_view
-    from luxin.config import InspectorConfig, get_default_config
+    from luxin_core.config import InspectorConfig, get_default_config
 
     kwargs_copy = dict(kwargs)
     config_obj = kwargs_copy.pop("config", None)

@@ -9,7 +9,7 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 import pandas as pd
 import streamlit as st
 
-from luxin.config import InspectorConfig, get_default_config
+from luxin_core.config import InspectorConfig, get_default_config
 
 
 def _with_join_columns(df: pd.DataFrame, join_keys: Sequence[str]) -> pd.DataFrame:

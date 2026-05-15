@@ -12,6 +12,10 @@ python:
   install:
     - requirements: docs/requirements.txt
     - method: pip
+      path: luxin_core
+    - method: pip
+      path: luxin_nb
+    - method: pip
       path: .
       extra_requirements:
         - dev

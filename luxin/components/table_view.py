@@ -11,14 +11,14 @@ from luxin.components.breadcrumbs import render_drill_breadcrumbs
 from luxin.components.detail_panel import render_detail_panel
 from luxin.components.filters import render_filters
 from luxin.components.export import render_export_buttons
-from luxin.config import InspectorConfig, get_default_config
-from luxin.drill_hierarchy import (
+from luxin_core.config import InspectorConfig, get_default_config
+from luxin_core.drill_hierarchy import (
     DrillHierarchySpec,
     ensure_initial_stack,
     stack_state_key,
     try_push_selected,
 )
-from luxin.utils import finalize_source_mapping, normalize_group_key
+from luxin_core.utils import finalize_source_mapping, normalize_group_key
 from luxin._streamlit_compat import (
     dataframe_selection_guard_message,
     dataframe_selection_supported,
