@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "luxin"
-version = "0.3.0"
+version = "0.2.1"
 description = "Streamlit-first interactive data exploration with drill-down capabilities for exploring aggregated data"
 readme = "README.md"
 requires-python = ">=3.8"
