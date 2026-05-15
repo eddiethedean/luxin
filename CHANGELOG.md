@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Comparison** (`luxin.compare`): UI and docstrings clarify Welch t-tests use pooled columns, not row-pairing by join keys.
 - **CI**: GitHub Actions tests and lint also run on the **`master`** branch (default for this repo).
 - **Packaging**: `project.license` uses the PEP 621 table form (`{ text = "MIT" }`) so `pip install -e .` succeeds with current setuptools (fixes the CI install step).
+- **Polars**: `convert_polars_to_pandas` raises `TypeError` for invalid inputs when Polars is not installed (not `ImportError`).
+
+### Documentation
 
 - User guide, API reference, and `examples/phase3_multi_level.py` document Phase 3 workflows.
 
