@@ -48,6 +48,10 @@ dev = [
 [tool.setuptools]
 packages = ["luxin", "luxin.components"]
 
+# Monorepo: ty resolves first-party imports for sibling packages (see docs.astral.sh/ty/modules).
+[tool.ty.environment]
+extra-paths = ["luxin_core", "luxin_nb"]
+
 [project.urls]
 Repository = "https://github.com/eddiethedean/luxin"
 Homepage = "https://github.com/eddiethedean/luxin"

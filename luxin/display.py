@@ -30,9 +30,7 @@ def display_drill_table(
     if env == "streamlit":
         from luxin.streamlit_backend import display_streamlit
 
-        display_streamlit(
-            agg_df, detail_df, source_mapping, groupby_cols, **kwargs
-        )
+        display_streamlit(agg_df, detail_df, source_mapping, groupby_cols, **kwargs)
         return
 
     try:
@@ -40,9 +38,7 @@ def display_drill_table(
     except ImportError as e:
         raise ImportError(_NOTEBOOK_INSTALL_HINT) from e
 
-    display_notebook(
-        agg_df, detail_df, source_mapping, groupby_cols, **kwargs
-    )
+    display_notebook(agg_df, detail_df, source_mapping, groupby_cols, **kwargs)
 
 
 def _detect_environment() -> str:

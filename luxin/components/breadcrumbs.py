@@ -6,7 +6,11 @@ from typing import Callable, List, Optional
 
 import streamlit as st
 
-from luxin_core.drill_hierarchy import DrillLevelContext, DrillHierarchySpec, truncate_stack
+from luxin_core.drill_hierarchy import (
+    DrillLevelContext,
+    DrillHierarchySpec,
+    truncate_stack,
+)
 
 
 def render_drill_breadcrumbs(

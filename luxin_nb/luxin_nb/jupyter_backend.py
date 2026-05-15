@@ -16,9 +16,7 @@ def display_jupyter(
     **kwargs: Any,
 ) -> None:
     """Display an interactive drill-down table in Jupyter notebook."""
-    display_drill_table(
-        agg_df, detail_df, source_mapping, groupby_cols, **kwargs
-    )
+    display_drill_table(agg_df, detail_df, source_mapping, groupby_cols, **kwargs)
 
 
 __all__ = ["display_jupyter", "display_drill_table"]
