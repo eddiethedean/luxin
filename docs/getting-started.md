@@ -72,7 +72,7 @@ streamlit run app.py
 
 ## Next Steps
 
-- Read the [User Guide](user-guide.md), including Phase 3 (v0.3.0) optional features (multi-level drill, comparison, quality, aggregation builder)
+- Read the [User Guide](user-guide.md), including Phase 3 optional features (v0.3.0+) and coordinated **`luxin` / `luxin-core` / `luxin-nb`** releases (**v0.4.x**)
 - Check out [Examples](examples.md) and run `examples/phase3_multi_level.py` with Streamlit
 - Explore the [API Reference](api-reference.md) for `Inspector`, `InspectorConfig`, and `DrillHierarchySpec`
 

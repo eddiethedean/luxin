@@ -1,6 +1,6 @@
 # Migration Guide
 
-Guide for migrating from legacy Luxin APIs to the **`Inspector`** API (stable since **v0.2.0**) and adopting **v0.3.0** optional features where useful.
+Guide for migrating from legacy Luxin APIs to the **`Inspector`** API (stable since **v0.2.0**) and adopting **v0.3.0** optional features where useful. **v0.4.0** coordinates monorepo packages and tooling only; no migration steps beyond staying on current pinned versions.
 
 ## Overview
 
@@ -187,6 +187,7 @@ These are **additive**: defaults keep `Inspector(agg).render()` behavior unchang
 - **v0.2.0**: `Inspector` API introduced; `show_drill_table` / legacy patterns deprecated with warnings
 - **v0.2.1**: Streamlit **1.35+** required for dataframe row selection; normalized drill-down keys; clearer warnings for incomplete tracking; see [CHANGELOG.md](../CHANGELOG.md)
 - **v0.3.0**: Phase 3 optional features (multi-level drill, comparison, quality, aggregation builder); legacy APIs still present with deprecation warnings (removal is a future major version concern, not tied to 0.3.0)
+- **v0.4.0**: `luxin`, `luxin-core`, and `luxin-nb` aligned at **0.4.x**; stronger release checks and tests for `luxin-nb` HTML rendering—no API changes from v0.3.0 for Streamlit workflows
 
 ## Need Help?
 

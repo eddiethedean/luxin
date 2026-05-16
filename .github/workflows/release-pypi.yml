@@ -21,7 +21,9 @@ jobs:
 
       - name: Verify tag matches package versions
         run: |
+          set -euo pipefail
           TAG_VERSION="${GITHUB_REF_NAME#v}"
+          export TAG_VERSION
           for f in pyproject.toml luxin_core/pyproject.toml luxin_nb/pyproject.toml; do
             PKG_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('$f', 'rb'))['project']['version'])")
             if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
@@ -29,6 +31,39 @@ jobs:
               exit 1
             fi
           done
+          python3 <<'PY'
+          import ast
+          import os
+          import pathlib
+
+          tag = os.environ["TAG_VERSION"]
+          paths = [
+              pathlib.Path("luxin/__init__.py"),
+              pathlib.Path("luxin_core/luxin_core/__init__.py"),
+              pathlib.Path("luxin_nb/luxin_nb/__init__.py"),
+          ]
+          for path in paths:
+              tree = ast.parse(path.read_text(encoding="utf-8"))
+              found = None
+              for node in tree.body:
+                  if isinstance(node, ast.Assign):
+                      for target in node.targets:
+                          if isinstance(target, ast.Name) and target.id == "__version__":
+                              val = node.value
+                              if isinstance(val, ast.Constant) and isinstance(val.value, str):
+                                  found = val.value
+                                  break
+                  if found is not None:
+                      break
+              if found is None:
+                  print(f"::error::No string __version__ assignment found in {path}")
+                  raise SystemExit(1)
+              if found != tag:
+                  print(
+                      f"::error::Tag encodes {tag!r} but {path} has __version__ = {found!r}"
+                  )
+                  raise SystemExit(1)
+          PY
           echo "Releasing version ${TAG_VERSION}"
 
       - name: Install build tools

@@ -8,6 +8,10 @@ build/
 develop-eggs/
 # Packaging output at repo root (dist, dist_build, dist-*, …)
 /dist*
+
+# Do not vendor duplicate historical trees (use PyPI / git tags).
+luxin-0.2.1/
+
 downloads/
 eggs/
 .eggs/

@@ -165,7 +165,7 @@ Comprehensive documentation is available:
 - [Examples](docs/examples.md) - Code examples and tutorials
 - [Roadmap](docs/roadmap.md) - Future features and development plans
 - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
-- [Migration Guide](docs/migration.md) - Migrating from legacy APIs; what’s new through **v0.3.0**
+- [Migration Guide](docs/migration.md) - Migrating from legacy APIs; Phase 3 optional features through **v0.3.0** (packages **v0.4.0** coordinate releases; see [CHANGELOG.md](CHANGELOG.md))
 - [Changelog](CHANGELOG.md) - Release history
 
 Full documentation: https://luxin.readthedocs.io/
@@ -190,6 +190,7 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ --cov=luxin --cov-report=html
 Luxin maintains **85%+ test coverage** with comprehensive tests for:
 - Core Inspector functionality
 - UI components (table view, drill stack, breadcrumbs, detail panel, filters, export, Phase 3 modules)
+- Jupyter/HTML rendering (`luxin_nb`)
 - Data validation and error handling
 - Polars integration
 - Configuration management
@@ -205,7 +206,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-**Releasing a version:** ensure `pyproject.toml` and `luxin.__version__` match, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.3.0`). The tag must match the package version: the PyPI workflow checks this before publishing.
+**Releasing a version:** ensure each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py` match, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.0`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
 
 ## 📄 License
 
@@ -213,7 +214,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📌 Current release
 
-**v0.3.0** — Phase 3 features (multi-level drill, comparison helpers, data quality, aggregation builder); see [CHANGELOG.md](CHANGELOG.md). **v0.2.1** fixes (Streamlit packaging, selection API, key normalization) remain documented there.
+**v0.4.0** — Coordinated **`luxin` / `luxin-core` / `luxin-nb`** releases, expanded **`luxin_nb`** test coverage, repository cleanup, and stricter release checks; user-visible Phase 3 behavior unchanged from **v0.3.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 **Requirements**: **Streamlit >= 1.35** for dataframe row selection (`on_select` / `selection_mode`).
 
@@ -221,10 +222,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 See [Roadmap](docs/roadmap.md) for the full picture. At a glance:
 
-- **v0.3.0** (current): Phase 3 shipped — optional drill hierarchy, `luxin.compare`, quality dashboard, aggregation builder
-- **target v0.4.0**: Phase 1 core enhancements (charts, richer filters, performance, export)
-- **target v0.5.0**: Phase 2 data sources (SQL, cloud, APIs)
-- **target v0.6.0**: Phase 4 collaboration & sharing
+- **v0.3.0**: Phase 3 shipped — optional drill hierarchy, `luxin.compare`, quality dashboard, aggregation builder
+- **v0.4.0** (current packaging line): aligned PyPI packages, notebook HTML tests, CI/release hygiene (not the Phase 1 feature milestone)
+- **target v0.5.0**: Phase 1 core enhancements (charts, richer filters, performance, export)
+- **target v0.6.0**: Phase 2 data sources (SQL, cloud, APIs)
+- **target v0.7.0**: Phase 4 collaboration & sharing
 - **target v1.0.0**: Phase 5 enterprise features
 
 ## 🔗 Links

@@ -27,7 +27,7 @@ See the [User Guide](user-guide.md) for current capabilities and the [API Refere
 
 ## Roadmap Phases
 
-### Phase 1: Core Enhancements (target v0.4.0)
+### Phase 1: Core Enhancements (target v0.5.0)
 
 **Timeline**: Original planning used Q1 2024 targets; timelines are illustrative and evolve with maintainer bandwidth (last reviewed 2026).  
 **Priority**: High  
@@ -530,5 +530,5 @@ We welcome feedback! Please open an issue on [GitHub](https://github.com/eddieth
 ---
 
 **Last Updated**: May 2026  
-**Version targets**: Phase 3 delivered **v0.3.0**; Phases **1→2→4→5** use **target v0.4.0 → v0.5.0 → v0.6.0 → v1.0.0** (illustrative)
+**Version targets**: Phase 3 delivered **v0.3.0**; **v0.4.0** aligns `luxin`, `luxin-core`, and `luxin-nb` packaging and CI (not the Phase 1 milestone). Phases **1→2→4→5** use **target v0.5.0 → v0.6.0 → v0.7.0 → v1.0.0** (illustrative)
 

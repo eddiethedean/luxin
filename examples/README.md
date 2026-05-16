@@ -1,6 +1,6 @@
 # Luxin Examples
 
-Runnable **Streamlit** scripts and Jupyter notebooks demonstrating Luxin **v0.3.0**.
+Runnable **Streamlit** scripts and Jupyter notebooks demonstrating Luxin (**Phase 3** in **v0.3.0**+; packages ship as **v0.4.x**).
 
 ## Streamlit scripts
 

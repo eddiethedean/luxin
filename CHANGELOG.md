@@ -5,6 +5,25 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-05-15
+
+### Changed
+
+- **Monorepo releases**: `luxin`, `luxin-core`, and `luxin-nb` are aligned at **0.4.x** so tags and PyPI uploads stay in lockstep.
+
+### Added
+
+- **Tests**: unit coverage for **`luxin_nb`** HTML drill-down (`render_html`, row key injection, embedded source-mapping JSON).
+
+### Fixed
+
+- **Release CI**: verify each package’s **`__version__`** matches the git tag, not only `pyproject.toml`.
+- **CI**: `pytest` runs with **`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`** (matches local development docs).
+
+### Documentation
+
+- README and roadmap: **v0.4.0** as current coordinated release; Phase 1 onward targets bumped (see [Roadmap](docs/roadmap.md)).
+
 ## [0.3.0] - 2026-05-15
 
 ### Added
