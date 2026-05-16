@@ -181,16 +181,24 @@ git clone https://github.com/eddiethedean/luxin.git
 cd luxin
 pip install -e ./luxin_core -e ./luxin_nb -e ".[dev]"
 
-# Run tests (if global pytest plugins emit async-fixture errors on your machine):
+# Run tests (if global pytest plugins emit async-fixture errors on your machine,
+# autoload is disabled — load the coverage plugin explicitly when needed):
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/
 
-# Run tests with coverage
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ --cov=luxin --cov-report=html
+# Combined coverage for luxin + luxin_core + luxin_nb (matches CI):
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -p pytest_cov \
+  --cov=luxin --cov=luxin_core --cov=luxin_nb --cov-report=term --cov-fail-under=79
+
+# HTML report
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -p pytest_cov \
+  --cov=luxin --cov=luxin_core --cov=luxin_nb --cov-report=html
 ```
+
+Optional markers (see `pytest.ini`): `-m streamlit`, `-m notebook`, `-m polars`, `-m slow`.
 
 ### Test Coverage
 
-Luxin maintains **85%+ test coverage** with comprehensive tests for:
+CI enforces a minimum **combined line coverage** across `luxin`, `luxin_core`, and `luxin_nb` (`--cov-fail-under=79` in `.github/workflows/ci.yml`). The suite includes:
 - Core Inspector functionality
 - UI components (table view, drill stack, breadcrumbs, detail panel, filters, export, Phase 3 modules)
 - Jupyter/HTML rendering (`luxin_nb`)

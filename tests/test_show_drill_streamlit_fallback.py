@@ -34,14 +34,18 @@ def test_inspector_import_fall_through_rejects_non_module_not_found():
     assert _inspector_import_should_fall_through(ValueError("x")) is False
 
 
-def test_show_drill_table_falls_through_when_streamlit_and_ipython_unavailable(monkeypatch):
+def test_show_drill_table_falls_through_when_streamlit_and_ipython_unavailable(
+    monkeypatch,
+):
     """Without Streamlit, skip Inspector; without IPython, luxin_nb import fails with notebook hint."""
     real_import = builtins.__import__
 
     def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
         if isinstance(name, str):
             if name == "streamlit" or name.startswith("streamlit."):
-                raise ModuleNotFoundError("No module named 'streamlit'", name="streamlit")
+                raise ModuleNotFoundError(
+                    "No module named 'streamlit'", name="streamlit"
+                )
             if name == "IPython" or name.startswith("IPython."):
                 raise ModuleNotFoundError("No module named 'IPython'", name="IPython")
         return real_import(name, globals, locals, fromlist, level)

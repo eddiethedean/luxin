@@ -77,9 +77,7 @@ def test_validate_manual_drill_flat_index_requires_one_groupby_col():
     detail_df = pd.DataFrame({"category": ["A"], "value": [1]})
     agg_df = detail_df.groupby("category").sum()
     with pytest.raises(ValueError, match="exactly one"):
-        validate_manual_drill_inputs(
-            agg_df, detail_df, ["category", "value"]
-        )
+        validate_manual_drill_inputs(agg_df, detail_df, ["category", "value"])
 
 
 def test_validate_manual_drill_multi_column_ok():

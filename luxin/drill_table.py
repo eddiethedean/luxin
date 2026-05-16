@@ -10,7 +10,10 @@ from typing import Any, List
 import pandas as pd
 
 from luxin.display import display_drill_table
-from luxin_core.drill_table import build_manual_source_mapping, validate_manual_drill_inputs
+from luxin_core.drill_table import (
+    build_manual_source_mapping,
+    validate_manual_drill_inputs,
+)
 from luxin_core.utils import SourceMapping
 
 

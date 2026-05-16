@@ -29,7 +29,9 @@ jobs:
     
     - name: Run tests
       run: |
-        PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v --cov=luxin --cov=luxin_core --cov=luxin_nb --cov-report=xml --cov-report=term
+        PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v -p pytest_cov \
+          --cov=luxin --cov=luxin_core --cov=luxin_nb \
+          --cov-report=xml --cov-report=term --cov-fail-under=79
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
@@ -84,7 +86,9 @@ jobs:
 
     - name: Run tests (Polars install)
       run: |
-        PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v --tb=short
+        PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v -p pytest_cov \
+          --cov=luxin --cov=luxin_core --cov=luxin_nb \
+          --cov-report=term --cov-fail-under=79 --tb=short
 
   build:
     runs-on: ubuntu-latest
