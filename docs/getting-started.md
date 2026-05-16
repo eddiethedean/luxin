@@ -22,6 +22,11 @@ For optional **SciPy**-backed statistical tests in **`luxin.compare.inspect_pair
 pip install luxin[compare]
 ```
 
+For **Jupyter / HTML** drill-down (`luxin_nb`, used by **`create_drill_table`** and **`TrackedDataFrame.show_drill_table`** when not in Streamlit):
+```bash
+pip install luxin[notebook]
+```
+
 ## Requirements
 
 - Python 3.8 or higher
@@ -76,5 +81,5 @@ streamlit run app.py
 
 - Read the [User Guide](user-guide.md), including Phase 3 optional features (v0.3.0+) and coordinated **`luxin` / `luxin-core` / `luxin-nb`** releases (**v0.4.x**)
 - Check out [Examples](examples.md) and run `examples/phase3_multi_level.py` with Streamlit
-- Explore the [API Reference](api-reference.md) for `Inspector`, `InspectorConfig`, and `DrillHierarchySpec`
+- Explore the [API Reference](api-reference.md) for `Inspector`, `InspectorConfig`, **`create_drill_table`**, and `DrillHierarchySpec`
 

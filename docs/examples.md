@@ -12,6 +12,27 @@ streamlit run examples/phase3_multi_level.py
 
 Full walkthrough: [User Guide — Advanced Usage](user-guide.md#advanced-usage).
 
+## Manual drill (`create_drill_table`)
+
+When **`agg_df`** is already computed (e.g. single-column **`groupby`** on **`detail_df`**):
+
+```python
+import streamlit as st
+import pandas as pd
+from luxin import create_drill_table
+
+st.title("Manual drill-down")
+detail_df = pd.DataFrame({"category": ["A", "A", "B"], "value": [1, 2, 3]})
+agg_df = detail_df.groupby("category", dropna=False).sum()
+
+from luxin_core.drill_table import validate_manual_drill_inputs
+
+validate_manual_drill_inputs(agg_df, detail_df, ["category"])
+create_drill_table(agg_df, detail_df, groupby_cols=["category"])
+```
+
+See [API Reference](api-reference.md) and [User Guide](user-guide.md) (Pre-aggregated data).
+
 ## Basic Example
 
 Simple example showing the core functionality:

@@ -146,6 +146,20 @@ inspector = Inspector(agg, config=cfg)
 
 For multi-level drill, set **`DrillHierarchySpec.session_key`** per hierarchy. See also [Phase 3 in the roadmap](roadmap.md).
 
+## Manual drill and NA group keys
+
+**Problem:** Using **`create_drill_table`** or **`build_manual_source_mapping`**, detail rows are empty for aggregate rows whose group key contains **missing values** (`NaN`, `NaT`, `pd.NA`) with **`groupby(..., dropna=False)`**.
+
+**Solution:** Upgrade to a release that includes the **Unreleased** fixes documented in [Changelog](changelog.md) (NA-aware masks on detail columns). Prefer **`TrackedDataFrame`** groupby when you can rebuild the aggregate so lineage is automatic.
+
+## `show_drill_table` without Streamlit
+
+**Problem:** Calling **`TrackedDataFrame.show_drill_table()`** in an environment where **Streamlit** is not importable.
+
+**Behavior:** The method tries **`luxin.inspector.Inspector`** first; if that fails only because **`luxin`** or **Streamlit** is missing, it falls back to **`luxin_nb`** when installed.
+
+**Solution:** For notebooks, run **`pip install luxin[notebook]`** (or **`luxin-nb`**) and use Jupyter/IPython. For apps, install Streamlit and use **`Inspector(agg).render()`** inside **`streamlit run`**.
+
 ## Getting Help
 
 If you encounter issues not covered here:

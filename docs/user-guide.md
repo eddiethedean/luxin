@@ -94,6 +94,22 @@ inspector = Inspector(agg)
 inspector.render()
 ```
 
+### Pre-aggregated data (manual source mapping)
+
+When you already have **`agg_df`** and **`detail_df`** (for example from SQL or a legacy pandas pipeline), you can build drill-down without re-running **`TrackedDataFrame`** groupby:
+
+```python
+from luxin import create_drill_table
+
+create_drill_table(agg_df, detail_df, groupby_cols=["category"])
+```
+
+**Rules:** `groupby_cols` must exist on **`detail_df`**. For a **flat** aggregate index, pass **exactly one** column name (the grouping column in the detail frame). For a **`MultiIndex`** aggregate index, pass **one name per level**, in order, matching **`validate_manual_drill_inputs`** / **`luxin_core.drill_table`**.
+
+**Missing values in keys:** If aggregates use **`groupby(..., dropna=False)`**, group keys may contain **`NaN`**, **`NaT`**, or **`pd.NA`**. Manual source mapping matches those rows correctly (NA-aware equality on the detail columns).
+
+For programmatic use without UI, call **`luxin_core.drill_table.build_manual_source_mapping`** (or the re-export on **`luxin.drill_table`**) after **`validate_manual_drill_inputs`**.
+
 ### Phase 3 — multi-level drill-down (v0.3.0)
 
 Stack additional aggregations by passing a `DrillHierarchySpec` and enabling the feature flag:
@@ -161,7 +177,7 @@ This usually means:
 - The aggregation wasn't performed on a `TrackedDataFrame`
 - The source mapping wasn't properly tracked
 
-Solution: Ensure you use `TrackedDataFrame` from the start and perform aggregations on it.
+Solution: Ensure you use `TrackedDataFrame` from the start and perform aggregations on it. If you use **`create_drill_table` / `build_manual_source_mapping`**, see [Troubleshooting — Manual drill and NA group keys](troubleshooting.md#manual-drill-and-na-group-keys).
 
 ### Streamlit errors
 

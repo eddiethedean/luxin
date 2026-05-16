@@ -132,7 +132,9 @@ When you aggregate data using `TrackedDataFrame.groupby().agg()`, Luxin automati
 3. **Inspect** - Use `Inspector(agg_df).render()` to see interactive view
 4. **Drill Down** - Select any aggregated row to see underlying detail data
 
-## 💡 Use Cases
+**Pre-aggregated workflows:** use **`create_drill_table(agg_df, detail_df, groupby_cols)`** when the aggregate already exists (see [User Guide](docs/user-guide.md)). Manual source mapping is **NA-aware** for **`groupby(..., dropna=False)`** keys (**[Unreleased]** fixes in [CHANGELOG.md](CHANGELOG.md)).
+
+**Note:** **`TrackedDataFrame.show_drill_table()`** tries **`Inspector`** (Streamlit) first; if Streamlit is not importable, it attempts **`luxin_nb`** — install **`luxin[notebook]`** for Jupyter.
 
 * Exploring sales data by region, then drilling into individual transactions
 * Analyzing error logs by error type, then viewing specific error instances

@@ -29,6 +29,9 @@ env/
 ENV/
 venv_build/
 
+# Documentation (MkDocs local build output)
+/site/
+
 # Testing
 .pytest_cache/
 .coverage

@@ -75,12 +75,14 @@ inspector = Inspector(agg)
 inspector.render()
 ```
 
-**Alternative** (if you must use manual API):
+**Alternative** (pre-aggregated / manual lineage — **still supported**):
+
 ```python
-# create_drill_table still works but is deprecated
 from luxin import create_drill_table
 create_drill_table(agg_df, detail_df, groupby_cols=['category'])
 ```
+
+Use this when **`agg_df`** and **`detail_df`** come from an existing pipeline; prefer **`TrackedDataFrame`** for new code so **`Inspector`** gets full tracking without recomputing masks. **`create_drill_table`** is not deprecated; only **`from luxin import show_drill_table`** and **`_build_source_mapping`** emit **deprecation** warnings.
 
 ## New Features in v0.2.0
 
@@ -121,12 +123,15 @@ inspector.render()
 
 ## Backward Compatibility
 
-The old API (`show_drill_table()`, `create_drill_table()`) still works but will show deprecation warnings. It's recommended to migrate to the new API for:
+**`show_drill_table()`** on **`TrackedDataFrame`** remains available but is deprecated in favor of **`Inspector(agg).render()`**. Importing **`from luxin import show_drill_table`** issues a **`DeprecationWarning`**.
 
-- Better performance
-- More features
-- Future compatibility
-- Better error messages
+**`create_drill_table()`** remains a supported entry point for manual / pre-aggregated workflows and does **not** emit a deprecation warning. Internal alias **`_build_source_mapping`** is deprecated in favor of **`build_manual_source_mapping`**.
+
+It is still recommended to migrate interactive apps to **`Inspector`** for:
+
+- Streamlit-native widget integration
+- **`InspectorConfig`** (filters, export, Phase 3 toggles)
+- Fewer moving parts than routing through legacy **`show_drill_table`**
 
 ## Common Migration Patterns
 
@@ -188,6 +193,7 @@ These are **additive**: defaults keep `Inspector(agg).render()` behavior unchang
 - **v0.2.1**: Streamlit **1.35+** required for dataframe row selection; normalized drill-down keys; clearer warnings for incomplete tracking; see [CHANGELOG.md](../CHANGELOG.md)
 - **v0.3.0**: Phase 3 optional features (multi-level drill, comparison, quality, aggregation builder); legacy APIs still present with deprecation warnings (removal is a future major version concern, not tied to 0.3.0)
 - **v0.4.0**: `luxin`, `luxin-core`, and `luxin-nb` aligned at **0.4.x**; stronger release checks and tests for `luxin-nb` HTML rendering—no API changes from v0.3.0 for Streamlit workflows
+- **Unreleased (docs / patch)**: NA-aware **`build_manual_source_mapping`** for **`dropna=False`** keys; **`show_drill_table`** falls back to **`luxin_nb`** when Streamlit cannot be imported—see root **`CHANGELOG.md`**
 
 ## Need Help?
 

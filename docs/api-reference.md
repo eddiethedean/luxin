@@ -111,12 +111,35 @@ grouped = df.groupby('category')
 
 ### `TrackedDataFrame.show_drill_table()`
 
-Display the interactive drill-down table (deprecated).
+Display the drill-down table by routing to the current environment (deprecated as the primary API).
 
-**Note:** This method is deprecated. Use `Inspector(df).render()` instead.
+**Note:** Prefer `Inspector(agg).render()` for Streamlit apps. This method first tries `luxin.inspector.Inspector`; if that import fails only because **`luxin`** or **Streamlit** (`streamlit` / `streamlit.*`) is missing, it falls back to **`luxin_nb.display.display_drill_table`** when **`luxin-nb`** is installed (e.g. `pip install luxin[notebook]`).
 
 **Raises:**
-- `ValueError`: If called on a non-aggregated DataFrame
+
+- `ValueError`: If called on a non-aggregated DataFrame, or aggregation metadata (e.g. `_source_df`) is missing when the Inspector path is skipped.
+- `ImportError`: When neither Streamlit/`luxin` Inspector nor the notebook extra can run (message points to `luxin[notebook]` / `luxin-nb`).
+
+## Manual drill-down (create_drill_table)
+
+Use when you already have an **aggregated** frame and a **detail** frame and cannot rebuild the aggregate with `TrackedDataFrame` (legacy pipelines, SQL rollups, etc.).
+
+### `create_drill_table(agg_df, detail_df, groupby_cols, **kwargs)`
+
+Defined in **`luxin.drill_table`**. Validates inputs, builds a source mapping with **`build_manual_source_mapping`** (see **`luxin_core.drill_table`**), then calls **`luxin.display.display_drill_table`**, which chooses **Streamlit** or **Jupyter** based on the runtime (see **`luxin.streamlit_backend.display_streamlit`** / **`luxin_nb`**).
+
+**Parameters:**
+
+- `agg_df` (`pd.DataFrame`): Aggregated result; index must reflect group keys (flat index for single-column groupby, **`MultiIndex`** when grouping by multiple columns).
+- `detail_df` (`pd.DataFrame`): Row-level data; must contain **`groupby_cols`**.
+- `groupby_cols` (`List[str]`): Names aligned with `agg_df` index (**one** name for a flat index; **n** names matching **`agg_df.index.nlevels`** for a **`MultiIndex`**).
+- `**kwargs`: Forwarded toward **`InspectorConfig`** when using the Streamlit path (see **`display_streamlit`**).
+
+**When to prefer `TrackedDataFrame`:** Automatic lineage (`_source_mapping`, `_source_df`) from `TrackedDataFrame.groupby()` avoids recomputing masks and handles all tracked reducers consistently. Manual mapping builds masks over `detail_df`; missing-value keys with **`groupby(..., dropna=False)`** are matched in a NA-aware way as of the current **`[Unreleased]`** changelog.
+
+### `build_manual_source_mapping(agg_df, detail_df, groupby_cols)` (`luxin_core.drill_table`)
+
+Lower-level helper: returns a **`source_mapping`** (`dict` of normalized tuple keys to lists of detail index labels). Also available as **`luxin.drill_table.build_manual_source_mapping`** (re-export). Pair with **`validate_manual_drill_inputs`** when building UIs yourself.
 
 ## TrackedGroupBy
 
@@ -201,4 +224,8 @@ Renders two tables, a joined diff with `_left/_right/_delta/_pct_change` columns
 ### Package exports (`luxin`)
 
 Stable symbols from **`luxin`** include: **`Inspector`**, **`TrackedDataFrame`**, **`DrillHierarchySpec`**, **`create_drill_table`**, Polars helpers (`create_tracked_from_polars`, `convert_polars_to_pandas`, `is_polars_dataframe`). Prefer **`InspectorConfig`** from **`luxin.config`**.
+
+**Environment routing:** **`luxin.display.display_drill_table`** (and thus **`create_drill_table`**) dispatches to Streamlit inside `streamlit run` or to **`luxin_nb`** in Jupyter when the notebook extra is installed. **`render_html`** in **`luxin_nb`** returns HTML only.
+
+**Deprecation:** **`from luxin import show_drill_table`** still works with a **`DeprecationWarning`** (wrapper delegates to **`TrackedDataFrame.show_drill_table`**). **`luxin.drill_table._build_source_mapping`** is deprecated in favor of **`build_manual_source_mapping`**.
 

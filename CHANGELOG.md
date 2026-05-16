@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Manual source mapping** (`build_manual_source_mapping` / `create_drill_table`): match detail rows when aggregate group keys contain missing values (`NaN`, `NaT`, `pd.NA`) with `groupby(..., dropna=False)`; build filters with index-aligned boolean masks.
+- **`TrackedDataFrame.show_drill_table`**: when importing `luxin.inspector` fails with `ModuleNotFoundError` for **`streamlit`** or a **`streamlit.*`** submodule, fall through to the **`luxin_nb`** / Jupyter path instead of re-raising.
+
+### Added
+
+- **Tests**: NA group keys for manual mapping (`tests/test_drill_table.py`); `show_drill_table` import fallback (`tests/test_show_drill_streamlit_fallback.py`).
+
+### Documentation
+
+- User guide, API reference, troubleshooting, migration, and examples updated for manual drill NA behavior, `show_drill_table` / notebook fallback, and accurate `create_drill_table` status; Read the Docs nav includes **Releasing**.
+
 ## [0.4.0] - 2026-05-15
 
 ### Changed

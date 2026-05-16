@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 The canonical copy for GitHub and releases also lives at the repository root as [`CHANGELOG.md`](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md).
 
+## [Unreleased]
+
+Summary: NA-aware **`build_manual_source_mapping`** / **`create_drill_table`** for `dropna=False` keys; **`show_drill_table`** no longer blocks the notebook path when Streamlit is missing; new tests in **`tests/test_drill_table.py`** and **`tests/test_show_drill_streamlit_fallback.py`**. Documentation and MkDocs nav refreshed—see root [`CHANGELOG.md`](../CHANGELOG.md) for full bullets.
+
 ## [0.4.0] - 2026-05-15
 
 Coordinated **0.4.x** releases for `luxin`, `luxin-core`, and `luxin-nb`; tests for Jupyter/HTML rendering in `luxin-nb`; release workflow checks `__version__` against the tag; CI uses **`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`** for pytest. Canonical package roots are **`luxin/`**, **`luxin_core/`**, and **`luxin_nb/`** only (historic releases: PyPI/git tags). See root [`CHANGELOG.md`](../CHANGELOG.md) for full notes.

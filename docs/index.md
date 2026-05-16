@@ -16,6 +16,7 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 - [Migration Guide](migration.md) - Upgrading from older APIs
 - [Changelog](changelog.md) - Release history
 - [Roadmap](roadmap.md) - Future features and development plans
+- [Releasing](releasing.md) - Monorepo version alignment and PyPI checklist
 
 ## Key Features
 
@@ -33,7 +34,7 @@ Luxin helps you explore aggregated data interactively through an intuitive, Stre
 pip install luxin
 ```
 
-Optional: `pip install luxin[polars]` · `pip install luxin[compare]` (SciPy for comparison significance tests).
+Optional: `pip install luxin[notebook]` (Jupyter/HTML via `luxin-nb`) · `pip install luxin[polars]` · `pip install luxin[compare]` (SciPy for comparison significance tests).
 
 **Streamlit**: use **>= 1.35** so interactive row selection works (see [Troubleshooting](troubleshooting.md)).
 
