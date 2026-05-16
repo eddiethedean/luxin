@@ -3,7 +3,9 @@ Jupyter notebook backend for displaying interactive drill-down tables.
 """
 
 import pandas as pd
-from typing import Any, Dict, List
+from typing import Any, List
+
+from luxin_core.utils import SourceMapping
 
 from luxin_nb.display import display_drill_table
 
@@ -11,7 +13,7 @@ from luxin_nb.display import display_drill_table
 def display_jupyter(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
     **kwargs: Any,
 ) -> None:

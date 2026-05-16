@@ -102,3 +102,35 @@ def test_groupby_pd_grouper_not_supported():
     df = TrackedDataFrame({"d": pd.date_range("2020-01-01", periods=3), "v": [1, 2, 3]})
     with pytest.raises(NotImplementedError, match="column name"):
         df.groupby(pd.Grouper(key="d"))
+
+
+def test_tracked_groupby_apply_not_supported():
+    df = TrackedDataFrame({"a": [1, 2], "b": [10, 20]})
+    gb = df.groupby("a")
+    with pytest.raises(NotImplementedError, match="apply"):
+        gb.apply(lambda x: x.sum())
+
+
+def test_tracked_groupby_transform_not_supported():
+    df = TrackedDataFrame({"a": [1, 2], "b": [10, 20]})
+    gb = df.groupby("a")
+    with pytest.raises(NotImplementedError, match="transform"):
+        gb.transform(lambda x: x)
+
+
+def test_tracked_groupby_pipe_not_supported():
+    df = TrackedDataFrame({"a": [1, 2], "b": [10, 20]})
+    gb = df.groupby("a")
+
+    def _fn(x):
+        return x
+
+    with pytest.raises(NotImplementedError, match="pipe"):
+        gb.pipe(_fn)
+
+
+def test_tracked_groupby_other_methods_not_delegated():
+    df = TrackedDataFrame({"a": [1, 2], "b": [10, 20]})
+    gb = df.groupby("a")
+    with pytest.raises(AttributeError, match="first"):
+        gb.first()

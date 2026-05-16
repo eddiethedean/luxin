@@ -119,7 +119,7 @@ def test_validate_source_mapping_invalid_indices():
     # Index 99 doesn't exist
     source_mapping = {("A",): [0, 99]}
 
-    with pytest.raises(ValidationError, match="Invalid indices"):
+    with pytest.raises(ValidationError, match="Invalid detail labels"):
         validate_source_mapping(source_mapping, agg_df, detail_df)
 
 

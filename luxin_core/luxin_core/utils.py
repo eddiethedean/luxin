@@ -11,6 +11,12 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 
+# Values are pandas Index labels for rows in the detail (source) frame — not necessarily ints.
+DetailIndexLabel = Any
+
+# Mapping from normalized aggregate row keys (typically tuples) to detail row labels.
+SourceMapping = Dict[Any, List[DetailIndexLabel]]
+
 
 @lru_cache(maxsize=128)
 def get_cached_index_mapping(df_index: tuple) -> Dict[Any, int]:
@@ -61,21 +67,26 @@ def normalize_group_key(key: Any) -> tuple:
 
 
 def finalize_source_mapping(
-    source_mapping: Dict[Any, List[int]],
-) -> Dict[Any, List[int]]:
+    source_mapping: SourceMapping,
+) -> SourceMapping:
     """
-    Produce a canonical source mapping (normalized keys plus sorted unique index lists).
+    Produce a canonical source mapping (normalized keys plus sorted unique label lists).
 
     Merges numeric/numpy-compatible keys into the same bucket (e.g. ``np.int64(1)``
     resolves with ``1``).
 
     Args:
-        source_mapping: Mapping from aggregated row keys to detail row indices (labels).
+        source_mapping: Mapping from aggregated row keys to lists of **detail frame index labels**
+            (values passed to ``detail_df.loc[...]``).
 
     Returns:
-        New dictionary with canonical tuple keys and sorted unique indices.
+        New dictionary with canonical tuple keys and sorted unique labels.
+
+    Note:
+        ``sorted(set(v))`` assumes labels within each group are mutually comparable; mixed
+        incomparable types in one group can raise ``TypeError``.
     """
-    merged: Dict[Any, List[int]] = {}
+    merged: Dict[Any, List[DetailIndexLabel]] = {}
     for key, indices in source_mapping.items():
         nk = normalize_group_key(key)
         merged.setdefault(nk, []).extend(indices)
@@ -83,18 +94,18 @@ def finalize_source_mapping(
 
 
 def optimize_source_mapping(
-    source_mapping: Dict[Any, List[int]],
-) -> Dict[Any, List[int]]:
+    source_mapping: SourceMapping,
+) -> SourceMapping:
     """
-    Optimize source mapping by ensuring indices are sorted and unique.
+    Optimize source mapping by ensuring labels are sorted and unique.
 
     Args:
         source_mapping: Original source mapping
 
     Returns:
-        Optimized source mapping with sorted, unique indices
+        Optimized mapping with sorted, unique labels per key
     """
-    optimized: Dict[Any, List[int]] = {}
+    optimized: Dict[Any, List[DetailIndexLabel]] = {}
     for key, indices in source_mapping.items():
         optimized[key] = sorted(set(indices))
     return optimized

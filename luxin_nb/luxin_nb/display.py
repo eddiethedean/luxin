@@ -8,18 +8,18 @@ import os
 import random
 import re
 import string
-from typing import Any, Dict, List
+from typing import Any, List
 
 import pandas as pd
 from IPython.display import HTML, display
 
-from luxin_core.utils import finalize_source_mapping, normalize_group_key
+from luxin_core.utils import SourceMapping, finalize_source_mapping, normalize_group_key
 
 
 def display_drill_table(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
     **kwargs: Any,
 ) -> None:
@@ -82,7 +82,7 @@ def _json_str_for_mapping_key(key: Any) -> str:
 def render_html(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
 ) -> str:
     """
@@ -91,7 +91,7 @@ def render_html(
     Args:
         agg_df: The aggregated DataFrame to display
         detail_df: The detail DataFrame containing source rows
-        source_mapping: Dictionary mapping aggregated row keys to detail row indices
+        source_mapping: Mapping from aggregated row keys to lists of detail index labels
         groupby_cols: List of column names used to group the data
 
     Returns:

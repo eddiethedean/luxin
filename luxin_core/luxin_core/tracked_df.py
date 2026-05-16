@@ -5,6 +5,8 @@ TrackedDataFrame - A pandas DataFrame subclass that tracks source rows during ag
 import pandas as pd
 from typing import Any, Dict, List, Optional, cast
 
+from luxin_core.utils import DetailIndexLabel
+
 
 def _normalize_groupby_columns(by) -> List[str]:
     """
@@ -52,8 +54,14 @@ class TrackedDataFrame(pd.DataFrame):
     A pandas DataFrame subclass that automatically tracks which source rows
     contribute to each aggregated row during groupby operations.
 
+    Only specific reductions on :class:`TrackedGroupBy` preserve lineage (mapping back to
+    rows in the pre-aggregate frame): ``agg(...)``, ``sum``, ``mean``, ``count``, ``min``,
+    ``max``, ``std``, ``var``, and ``median``. Other pandas GroupBy APIs (e.g. ``apply``,
+    ``transform``, ``pipe``) are disabled because they do not produce tracked aggregates.
+
     Attributes:
-        _source_mapping: Dictionary mapping aggregated row IDs to lists of source row indices
+        _source_mapping: Maps aggregated row keys (tuples) to lists of **index labels** in
+            ``_source_df`` (suitable for ``_source_df.loc[labels]``).
         _is_aggregated: Boolean indicating if this DataFrame is an aggregation result
         _groupby_cols: List of column names used in the groupby operation
     """
@@ -62,7 +70,7 @@ class TrackedDataFrame(pd.DataFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._source_mapping: Dict[Any, List[int]] = {}
+        self._source_mapping: Dict[Any, List[DetailIndexLabel]] = {}
         self._is_aggregated = False
         self._groupby_cols: List[str] = []
         self._source_df: Optional[pd.DataFrame] = None
@@ -117,9 +125,17 @@ class TrackedDataFrame(pd.DataFrame):
         )
 
 
+_UNTRACKED_GROUPBY_MSG = (
+    "TrackedGroupBy does not implement {name!r}: it cannot preserve drill-down lineage. "
+    "Use ``.agg(...)`` or a tracked reducer such as ``.sum()`` / ``.mean()`` instead."
+)
+
+
 class TrackedGroupBy:
     """
-    A wrapper around pandas GroupBy that tracks source row indices during aggregation.
+    A wrapper around pandas GroupBy that tracks source row labels during aggregation.
+
+    Arbitrary GroupBy methods are not delegated: only tracked reductions are supported.
     """
 
     def __init__(self, df: TrackedDataFrame, by, **kwargs):
@@ -130,7 +146,7 @@ class TrackedGroupBy:
 
     def agg(self, func=None, *args, **kwargs):
         """
-        Perform aggregation while tracking source row indices.
+        Perform aggregation while tracking source row labels for drill-down.
         """
         # Perform the actual aggregation on the underlying DataFrame
         result = self.groupby_obj.agg(func, *args, **kwargs)
@@ -199,6 +215,15 @@ class TrackedGroupBy:
         """Median aggregation with tracking."""
         return self.agg("median", *args, **kwargs)
 
-    def __getattr__(self, name):
-        """Delegate other methods to the underlying GroupBy object."""
-        return getattr(self.groupby_obj, name)
+    def apply(self, *args, **kwargs):  # noqa: ANN002
+        raise NotImplementedError(_UNTRACKED_GROUPBY_MSG.format(name="apply"))
+
+    def transform(self, *args, **kwargs):  # noqa: ANN002
+        raise NotImplementedError(_UNTRACKED_GROUPBY_MSG.format(name="transform"))
+
+    def pipe(self, *args, **kwargs):  # noqa: ANN002
+        raise NotImplementedError(_UNTRACKED_GROUPBY_MSG.format(name="pipe"))
+
+    def __getattr__(self, name: str):
+        """Reject delegated GroupBy calls that would drop lineage tracking."""
+        raise AttributeError(_UNTRACKED_GROUPBY_MSG.format(name=name))

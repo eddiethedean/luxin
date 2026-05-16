@@ -120,11 +120,13 @@ Display the interactive drill-down table (deprecated).
 
 ## TrackedGroupBy
 
-A wrapper around pandas GroupBy that tracks source row indices during aggregation.
+A wrapper around pandas GroupBy that tracks **detail index labels** during aggregation.
+
+Only tracked reductions preserve drill lineage: ``agg(...)``, ``sum``, ``mean``, ``count``, ``min``, ``max``, ``std``, ``var``, and ``median``. Calling ``apply``, ``transform``, ``pipe``, or other pandas GroupBy APIs raises ``NotImplementedError`` or ``AttributeError`` with guidance to use ``agg``.
 
 ### `TrackedGroupBy.agg(func=None, *args, **kwargs)`
 
-Perform aggregation while tracking source row indices.
+Perform aggregation while tracking source row labels for drill-down.
 
 **Parameters:**
 - `func`: Aggregation function(s) (same as pandas)
@@ -164,7 +166,7 @@ Render the main table view with drill-down capabilities.
 **Parameters:**
 - `agg_df` (pd.DataFrame): The aggregated DataFrame to display
 - `detail_df` (pd.DataFrame): The detail DataFrame containing source rows
-- `source_mapping` (Dict): Dictionary mapping aggregated row keys to detail row indices
+- `source_mapping` (Dict): Mapping from aggregated row keys to lists of detail index labels
 - `groupby_cols` (List[str]): List of column names used to group the data
 
 ### `render_detail_panel(detail_rows, title, height, page_size, pagination_session_key)`

@@ -3,13 +3,15 @@ Streamlit backend for displaying interactive drill-down tables.
 """
 
 import pandas as pd
-from typing import Any, Dict, List
+from typing import List
+
+from luxin_core.utils import SourceMapping
 
 
 def display_streamlit(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
     **kwargs,
 ):
@@ -22,7 +24,7 @@ def display_streamlit(
     Args:
         agg_df: The aggregated DataFrame to display
         detail_df: The detail DataFrame containing source rows
-        source_mapping: Dictionary mapping aggregated row keys to detail row indices
+        source_mapping: Mapping from aggregated row keys to lists of detail index labels
         groupby_cols: List of column names used to group the data
         **kwargs: Forwarded into :class:`~luxin.config.InspectorConfig`; use ``config`` to pass an
                   instance explicitly. Unknown keys are ignored by ``InspectorConfig.from_dict``.

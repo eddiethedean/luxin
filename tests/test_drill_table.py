@@ -1,7 +1,11 @@
 """Tests for manual API functions."""
 
 import pandas as pd
-from luxin.drill_table import _build_source_mapping
+import pytest
+
+from luxin import drill_table as luxin_drill_table
+from luxin.drill_table import build_manual_source_mapping
+from luxin_core.drill_table import validate_manual_drill_inputs
 
 
 def test_build_source_mapping_single_column():
@@ -12,7 +16,7 @@ def test_build_source_mapping_single_column():
 
     agg_df = detail_df.groupby("category").sum()
 
-    mapping = _build_source_mapping(agg_df, detail_df, ["category"])
+    mapping = build_manual_source_mapping(agg_df, detail_df, ["category"])
 
     assert len(mapping) == 3
     assert set(mapping[("A",)]) == {0, 1}
@@ -32,7 +36,7 @@ def test_build_source_mapping_multi_column():
 
     agg_df = detail_df.groupby(["cat1", "cat2"]).sum()
 
-    mapping = _build_source_mapping(agg_df, detail_df, ["cat1", "cat2"])
+    mapping = build_manual_source_mapping(agg_df, detail_df, ["cat1", "cat2"])
 
     assert len(mapping) == 4
     assert set(mapping[("A", "X")]) == {0, 4}
@@ -47,8 +51,39 @@ def test_build_source_mapping_empty_groups():
 
     agg_df = detail_df.groupby("category").sum()
 
-    mapping = _build_source_mapping(agg_df, detail_df, ["category"])
+    mapping = build_manual_source_mapping(agg_df, detail_df, ["category"])
 
     assert len(mapping) == 2
     assert set(mapping[("A",)]) == {0, 1}
     assert set(mapping[("B",)]) == {2}
+
+
+def test_deprecated_build_source_mapping_warns():
+    detail_df = pd.DataFrame({"category": ["A"], "value": [1]})
+    agg_df = detail_df.groupby("category").sum()
+    with pytest.warns(DeprecationWarning, match="build_manual_source_mapping"):
+        luxin_drill_table._build_source_mapping(agg_df, detail_df, ["category"])
+
+
+def test_validate_manual_drill_multiindex_groupby_length_mismatch():
+    detail_df = pd.DataFrame({"a": [1, 2], "b": [3, 4], "v": [1.0, 2.0]})
+    agg_df = detail_df.groupby(["a", "b"]).sum()
+    with pytest.raises(ValueError, match="index.nlevels"):
+        validate_manual_drill_inputs(agg_df, detail_df, ["a"])
+
+
+def test_validate_manual_drill_flat_index_requires_one_groupby_col():
+    detail_df = pd.DataFrame({"category": ["A"], "value": [1]})
+    agg_df = detail_df.groupby("category").sum()
+    with pytest.raises(ValueError, match="exactly one"):
+        validate_manual_drill_inputs(
+            agg_df, detail_df, ["category", "value"]
+        )
+
+
+def test_validate_manual_drill_multi_column_ok():
+    detail_df = pd.DataFrame(
+        {"cat1": ["A", "B"], "cat2": ["X", "Y"], "value": [1.0, 2.0]}
+    )
+    agg_df = detail_df.groupby(["cat1", "cat2"]).sum()
+    validate_manual_drill_inputs(agg_df, detail_df, ["cat1", "cat2"])

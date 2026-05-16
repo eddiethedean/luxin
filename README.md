@@ -128,7 +128,7 @@ inspector.render()
 When you aggregate data using `TrackedDataFrame.groupby().agg()`, Luxin automatically tracks which source rows contribute to each aggregated row. When you select a row in the Inspector interface, a side panel shows all the detail rows that were aggregated to create that summary.
 
 1. **Create TrackedDataFrame** - Wrap your data in `TrackedDataFrame`
-2. **Aggregate** - Use standard pandas `groupby().agg()` operations
+2. **Aggregate** - Use `TrackedDataFrame.groupby()` with tracked reductions only: `.agg(...)`, `.sum()`, `.mean()`, `.count()`, `.min()`, `.max()`, `.std()`, `.var()`, `.median()`. Other pandas GroupBy APIs (e.g. `.apply()`, `.transform()`, `.pipe()`) are not supported because they cannot preserve drill lineage.
 3. **Inspect** - Use `Inspector(agg_df).render()` to see interactive view
 4. **Drill Down** - Select any aggregated row to see underlying detail data
 
@@ -160,6 +160,7 @@ streamlit run examples/phase3_multi_level.py
 Comprehensive documentation is available:
 
 - [Getting Started](docs/getting-started.md) - Installation and basic usage
+- [Releasing](docs/releasing.md) - Monorepo version alignment and release checklist
 - [User Guide](docs/user-guide.md) - Comprehensive usage documentation
 - [API Reference](docs/api-reference.md) - Complete API documentation
 - [Examples](docs/examples.md) - Code examples and tutorials
@@ -206,7 +207,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-**Releasing a version:** ensure each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py` match, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.0`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
+**Releasing a version:** follow [docs/releasing.md](docs/releasing.md). In short: align each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py`, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.0`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
 
 ## 📄 License
 

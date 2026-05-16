@@ -6,7 +6,7 @@ import hashlib
 
 import pandas as pd
 import streamlit as st
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 from luxin.components.breadcrumbs import render_drill_breadcrumbs
 from luxin.components.detail_panel import render_detail_panel
 from luxin.components.filters import render_filters
@@ -18,10 +18,15 @@ from luxin_core.drill_hierarchy import (
     stack_state_key,
     try_push_selected,
 )
-from luxin_core.utils import finalize_source_mapping, normalize_group_key
+from luxin_core.utils import finalize_source_mapping, normalize_group_key, SourceMapping
 from luxin._streamlit_compat import (
     dataframe_selection_guard_message,
     dataframe_selection_supported,
+)
+
+_SELECTION_UNMAPPED_MSG = (
+    "Could not map the selected row to an aggregate group key. "
+    "Try clearing filters, or ensure group-by columns appear in the table."
 )
 
 
@@ -225,7 +230,10 @@ def render_drill_stack_view(
                 )
         else:
             with col2:
-                st.info("👆 Click on a row in the table to see detail data")
+                if selected_row_num is not None:
+                    st.warning(_SELECTION_UNMAPPED_MSG)
+                else:
+                    st.info("👆 Click on a row in the table to see detail data")
     else:
         st.warning("No data to display.")
 
@@ -244,7 +252,7 @@ def render_drill_stack_view(
 def render_table_view(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
     config: Optional[InspectorConfig] = None,
     *,
@@ -256,7 +264,7 @@ def render_table_view(
     Args:
         agg_df: The aggregated DataFrame to display
         detail_df: The detail DataFrame containing source rows
-        source_mapping: Dictionary mapping aggregated row keys to detail row indices
+        source_mapping: Mapping from aggregated row keys to lists of detail index labels
         groupby_cols: List of column names used to group the data
         config: Optional configuration object
     """
@@ -332,7 +340,10 @@ def render_table_view(
             )
         else:
             with col2:
-                st.info("👆 Click on a row in the table to see detail data")
+                if selected_row_num is not None:
+                    st.warning(_SELECTION_UNMAPPED_MSG)
+                else:
+                    st.info("👆 Click on a row in the table to see detail data")
     else:
         st.warning("No data to display.")
 
@@ -355,7 +366,7 @@ def _show_row_details(
     row_key: tuple,
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
     detail_col: Any,
     config: Optional[InspectorConfig] = None,
@@ -369,7 +380,7 @@ def _show_row_details(
         row_key: Tuple key matching ``source_mapping`` (e.g. ``('A',)`` or ``('N','P')``).
         agg_df: The aggregated DataFrame
         detail_df: The detail DataFrame
-        source_mapping: Dictionary mapping aggregated row keys to detail row indices
+        source_mapping: Mapping from aggregated row keys to lists of detail index labels
         groupby_cols: Column names used in the groupby operation
         detail_col: Streamlit column to render details in
         pagination_base_key: Prefix for stable detail-pagination session keys (e.g. main table widget key)

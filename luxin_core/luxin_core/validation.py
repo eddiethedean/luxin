@@ -3,7 +3,9 @@ Input validation for luxin APIs.
 """
 
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Any
+
+from luxin_core.utils import SourceMapping
 
 
 class ValidationError(Exception):
@@ -72,13 +74,13 @@ def validate_groupby_cols(groupby_cols: List[str], df: pd.DataFrame) -> None:
 
 
 def validate_source_mapping(
-    source_mapping: Dict[Any, List[int]], agg_df: pd.DataFrame, detail_df: pd.DataFrame
+    source_mapping: SourceMapping, agg_df: pd.DataFrame, detail_df: pd.DataFrame
 ) -> None:
     """
     Validate source mapping structure and values.
 
     Args:
-        source_mapping: Dictionary mapping aggregated row keys to detail row indices
+        source_mapping: Mapping from aggregated row keys to lists of **detail index labels**
         agg_df: Aggregated DataFrame
         detail_df: Detail DataFrame
 
@@ -87,7 +89,8 @@ def validate_source_mapping(
     """
     if not isinstance(source_mapping, dict):
         raise ValidationError(
-            "source_mapping must be a dictionary mapping aggregated row keys to detail row indices."
+            "source_mapping must be a dictionary mapping aggregated row keys "
+            "to lists of detail index labels."
         )
 
     if len(source_mapping) == 0:
@@ -95,19 +98,18 @@ def validate_source_mapping(
             "source_mapping is empty. Ensure aggregation tracking is enabled."
         )
 
-    # Check that all indices in mapping are valid
     for key, indices in source_mapping.items():
         if not isinstance(indices, list):
             raise ValidationError(
-                f"source_mapping values must be lists of indices. "
+                f"source_mapping values must be lists of detail index labels. "
                 f"Got {type(indices).__name__} for key {key}."
             )
 
         invalid_indices = [idx for idx in indices if idx not in detail_df.index]
         if invalid_indices:
             raise ValidationError(
-                f"Invalid indices in source_mapping for key {key}: {invalid_indices}. "
-                f"Detail DataFrame has indices: {list(detail_df.index)[:10]}..."
+                f"Invalid detail labels in source_mapping for key {key}: {invalid_indices}. "
+                f"Detail DataFrame index sample: {list(detail_df.index)[:10]}..."
             )
 
 

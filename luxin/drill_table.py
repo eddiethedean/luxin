@@ -2,16 +2,16 @@
 Manual API for creating drill-down tables from existing DataFrames (Streamlit / Jupyter routing).
 """
 
-from typing import Any, Dict, List
+from __future__ import annotations
+
+import warnings
+from typing import Any, List
 
 import pandas as pd
 
 from luxin.display import display_drill_table
-from luxin_core.drill_table import (
-    _build_source_mapping,
-    build_manual_source_mapping,
-    validate_manual_drill_inputs,
-)
+from luxin_core.drill_table import build_manual_source_mapping, validate_manual_drill_inputs
+from luxin_core.utils import SourceMapping
 
 
 def create_drill_table(
@@ -26,7 +26,7 @@ def create_drill_table(
     Args:
         agg_df: The aggregated DataFrame to display
         detail_df: The detail DataFrame containing source rows
-        groupby_cols: List of column names used to group the data
+        groupby_cols: Column names aligned with ``agg_df`` index (one column when the index is flat)
         **kwargs: Additional options for display customization
 
     Raises:
@@ -44,10 +44,22 @@ def create_drill_table(
         >>> create_drill_table(agg_df, df, groupby_cols=['category'])
     """
     validate_manual_drill_inputs(agg_df, detail_df, groupby_cols)
-    source_mapping: Dict[Any, List[int]] = build_manual_source_mapping(
+    source_mapping: SourceMapping = build_manual_source_mapping(
         agg_df, detail_df, groupby_cols
     )
     display_drill_table(agg_df, detail_df, source_mapping, groupby_cols, **kwargs)
 
 
-__all__ = ["create_drill_table", "_build_source_mapping", "build_manual_source_mapping"]
+def _build_source_mapping(
+    agg_df: pd.DataFrame, detail_df: pd.DataFrame, groupby_cols: List[str]
+) -> SourceMapping:
+    """Deprecated alias for :func:`build_manual_source_mapping`."""
+    warnings.warn(
+        "_build_source_mapping is deprecated; use build_manual_source_mapping.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return build_manual_source_mapping(agg_df, detail_df, groupby_cols)
+
+
+__all__ = ["create_drill_table", "build_manual_source_mapping"]

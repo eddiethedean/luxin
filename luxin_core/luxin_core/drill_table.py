@@ -10,24 +10,24 @@ from luxin_core.validation import (
     validate_dataframe,
     validate_groupby_cols,
 )
-from luxin_core.utils import finalize_source_mapping
+from luxin_core.utils import DetailIndexLabel, finalize_source_mapping, SourceMapping
 
 
 def build_manual_source_mapping(
     agg_df: pd.DataFrame, detail_df: pd.DataFrame, groupby_cols: List[str]
-) -> Dict[Any, List[int]]:
+) -> SourceMapping:
     """
-    Build a mapping from aggregated row keys to detail row indices.
+    Build a mapping from aggregated row keys to detail row index labels.
 
     Args:
         agg_df: The aggregated DataFrame
         detail_df: The detail DataFrame
-        groupby_cols: List of column names used to group the data
+        groupby_cols: Column names matching ``agg_df`` index levels (one name when the index is flat)
 
     Returns:
-        Dictionary mapping aggregated row keys to lists of detail row indices
+        Mapping suitable for ``detail_df.loc[labels]`` per aggregated row key.
     """
-    source_mapping: Dict[Any, List[int]] = {}
+    source_mapping: Dict[Any, List[DetailIndexLabel]] = {}
 
     # Handle single vs multi-index
     if isinstance(agg_df.index, pd.MultiIndex):
@@ -75,3 +75,16 @@ def validate_manual_drill_inputs(
         validate_groupby_cols(groupby_cols, detail_df)
     except ValidationError as e:
         raise ValueError(str(e)) from e
+
+    if isinstance(agg_df.index, pd.MultiIndex):
+        expected = agg_df.index.nlevels
+        if len(groupby_cols) != expected:
+            raise ValueError(
+                f"groupby_cols length ({len(groupby_cols)}) must match "
+                f"agg_df.index.nlevels ({expected}) when agg_df has a MultiIndex."
+            )
+    elif len(groupby_cols) != 1:
+        raise ValueError(
+            "When agg_df has a flat (non-MultiIndex), groupby_cols must contain "
+            f"exactly one detail column name; got {len(groupby_cols)}."
+        )

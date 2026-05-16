@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, cast
 from luxin_core.polars_support import handle_polars_in_inspector, is_polars_dataframe
 from luxin_core.config import InspectorConfig, get_default_config
 from luxin_core.validation import validate_dataframe, ValidationError
-from luxin_core.utils import finalize_source_mapping
+from luxin_core.utils import DetailIndexLabel, finalize_source_mapping
 
 if TYPE_CHECKING:
     from luxin_core.drill_hierarchy import DrillHierarchySpec
@@ -64,7 +64,7 @@ class Inspector:
         self.drill = drill
 
         self._is_aggregated = False
-        self._source_mapping: Dict[Any, List[int]] = {}
+        self._source_mapping: Dict[Any, List[DetailIndexLabel]] = {}
         self._groupby_cols: List[str] = []
         self._source_df: Optional[pd.DataFrame] = None
 

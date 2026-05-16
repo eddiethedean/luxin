@@ -11,10 +11,13 @@ from luxin_core.polars_support import (
     is_polars_dataframe,
 )
 from luxin_core.tracked_df import TrackedDataFrame
+from luxin_core.utils import DetailIndexLabel, SourceMapping
 
 __version__ = "0.4.0"
 __all__ = [
+    "DetailIndexLabel",
     "DrillHierarchySpec",
+    "SourceMapping",
     "TrackedDataFrame",
     "build_manual_source_mapping",
     "convert_polars_to_pandas",

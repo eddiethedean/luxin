@@ -2,9 +2,11 @@
 Route drill-down display to Streamlit (in-app) or Jupyter HTML (optional ``luxin-nb``).
 """
 
-from typing import Any, Dict, List
+from typing import Any, List
 
 import pandas as pd
+
+from luxin_core.utils import SourceMapping
 
 _NOTEBOOK_INSTALL_HINT = (
     "Jupyter/HTML drill-down needs the notebook extra or luxin-nb. "
@@ -21,7 +23,7 @@ _STREAMLIT_CONTEXT_HINT = (
 def display_drill_table(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
     **kwargs: Any,
 ) -> None:
@@ -82,7 +84,7 @@ def _detect_environment() -> str:
 def render_html(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
-    source_mapping: Dict[Any, List[int]],
+    source_mapping: SourceMapping,
     groupby_cols: List[str],
 ) -> str:
     """Render the interactive drill-down HTML (requires ``luxin-nb``)."""
