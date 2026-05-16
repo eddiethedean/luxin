@@ -56,4 +56,5 @@ extra-paths = ["luxin_core", "luxin_nb"]
 [project.urls]
 Repository = "https://github.com/eddiethedean/luxin"
 Homepage = "https://github.com/eddiethedean/luxin"
+Documentation = "https://luxin.readthedocs.io/en/latest/"
 "Bug Tracker" = "https://github.com/eddiethedean/luxin/issues"

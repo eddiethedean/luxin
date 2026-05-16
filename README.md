@@ -4,7 +4,10 @@
 
 [![PyPI version](https://badge.fury.io/py/luxin.svg)](https://badge.fury.io/py/luxin)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Documentation](https://readthedocs.org/projects/luxin/badge/?version=latest)](https://luxin.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Documentation:** **[luxin.readthedocs.io](https://luxin.readthedocs.io/en/latest/)** (built with MkDocs from the `docs/` directory).
 
 Luxin helps you explore aggregated data interactively through an intuitive, Streamlit-native interface. Perfect for data scientists, analysts, and engineers who need to drill down into summary statistics to understand the underlying data.
 
@@ -132,7 +135,7 @@ When you aggregate data using `TrackedDataFrame.groupby().agg()`, Luxin automati
 3. **Inspect** - Use `Inspector(agg_df).render()` to see interactive view
 4. **Drill Down** - Select any aggregated row to see underlying detail data
 
-**Pre-aggregated workflows:** use **`create_drill_table(agg_df, detail_df, groupby_cols)`** when the aggregate already exists (see [User Guide](docs/user-guide.md)). Manual source mapping is **NA-aware** for **`groupby(..., dropna=False)`** keys (**[Unreleased]** fixes in [CHANGELOG.md](CHANGELOG.md)).
+**Pre-aggregated workflows:** use **`create_drill_table(agg_df, detail_df, groupby_cols)`** when the aggregate already exists (see the [User Guide](https://luxin.readthedocs.io/en/latest/user-guide/)). Manual source mapping is **NA-aware** for **`groupby(..., dropna=False)`** keys; see the [Changelog](https://luxin.readthedocs.io/en/latest/changelog/).
 
 **Note:** **`TrackedDataFrame.show_drill_table()`** tries **`Inspector`** (Streamlit) first; if Streamlit is not importable, it attempts **`luxin_nb`** — install **`luxin[notebook]`** for Jupyter.
 
@@ -146,9 +149,9 @@ When you aggregate data using `TrackedDataFrame.groupby().agg()`, Luxin automati
 
 Check out the example files:
 
-- [Basic Usage](examples/basic_usage.py) - Simple examples of Inspector API
-- [Sales Analysis](examples/sales_analysis.py) - Real-world sales data exploration
-- [Phase 3 demo](examples/phase3_multi_level.py) - Multi-level drill, quality panel, aggregation builder flags
+- [Basic Usage](https://github.com/eddiethedean/luxin/blob/master/examples/basic_usage.py) - Simple examples of Inspector API
+- [Sales Analysis](https://github.com/eddiethedean/luxin/blob/master/examples/sales_analysis.py) - Real-world sales data exploration
+- [Phase 3 demo](https://github.com/eddiethedean/luxin/blob/master/examples/phase3_multi_level.py) - Multi-level drill, quality panel, aggregation builder flags
 
 Run examples with Streamlit:
 ```bash
@@ -159,19 +162,19 @@ streamlit run examples/phase3_multi_level.py
 
 ## 📚 Documentation
 
-Comprehensive documentation is available:
+Full guides and API notes live on **[Read the Docs](https://luxin.readthedocs.io/en/latest/)**:
 
-- [Getting Started](docs/getting-started.md) - Installation and basic usage
-- [Releasing](docs/releasing.md) - Monorepo version alignment and release checklist
-- [User Guide](docs/user-guide.md) - Comprehensive usage documentation
-- [API Reference](docs/api-reference.md) - Complete API documentation
-- [Examples](docs/examples.md) - Code examples and tutorials
-- [Roadmap](docs/roadmap.md) - Future features and development plans
-- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
-- [Migration Guide](docs/migration.md) - Migrating from legacy APIs; Phase 3 optional features through **v0.3.0** (packages **v0.4.0** coordinate releases; see [CHANGELOG.md](CHANGELOG.md))
-- [Changelog](CHANGELOG.md) - Release history
+- [Getting Started](https://luxin.readthedocs.io/en/latest/getting-started/) — Installation and basic usage
+- [User Guide](https://luxin.readthedocs.io/en/latest/user-guide/) — Comprehensive usage
+- [API Reference](https://luxin.readthedocs.io/en/latest/api-reference/) — Public API surface
+- [Examples](https://luxin.readthedocs.io/en/latest/examples/) — Walkthroughs and patterns
+- [Troubleshooting](https://luxin.readthedocs.io/en/latest/troubleshooting/) — Common issues
+- [Migration Guide](https://luxin.readthedocs.io/en/latest/migration/) — Upgrading from legacy APIs
+- [Changelog](https://luxin.readthedocs.io/en/latest/changelog/) — Release history
+- [Roadmap](https://luxin.readthedocs.io/en/latest/roadmap/) — Planned work
+- [Releasing](https://luxin.readthedocs.io/en/latest/releasing/) — Maintainers: monorepo version alignment and PyPI checklist
 
-Full documentation: https://luxin.readthedocs.io/
+**Contributors:** Markdown sources are in [`docs/`](https://github.com/eddiethedean/luxin/tree/master/docs). Preview locally with `mkdocs serve` ([`mkdocs.yml`](https://github.com/eddiethedean/luxin/blob/master/mkdocs.yml)).
 
 ## 🛠️ Development
 
@@ -217,21 +220,21 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-**Releasing a version:** follow [docs/releasing.md](docs/releasing.md). In short: align each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py`, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.0`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
+**Releasing a version:** follow the [Releasing](https://luxin.readthedocs.io/en/latest/releasing/) guide. In short: align each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py`, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.0`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License — see the [LICENSE](https://github.com/eddiethedean/luxin/blob/master/LICENSE) file for details.
 
 ## 📌 Current release
 
-**v0.4.0** — Coordinated **`luxin` / `luxin-core` / `luxin-nb`**; monorepo CI/release checks; fixes for **manual drill NA keys** and **`show_drill_table`** when Streamlit is missing; broader tests (incl. **`luxin_nb`** HTML and Streamlit-mocked UI) with a **combined coverage** gate in CI; docs refreshed (manual API, **Releasing** nav). Phase 3 Streamlit behavior unchanged from **v0.3.0**. See [CHANGELOG.md](CHANGELOG.md).
+**v0.4.0** — Coordinated **`luxin` / `luxin-core` / `luxin-nb`**; monorepo CI/release checks; fixes for **manual drill NA keys** and **`show_drill_table`** when Streamlit is missing; broader tests (incl. **`luxin_nb`** HTML and Streamlit-mocked UI) with a **combined coverage** gate in CI; docs refreshed (manual API, **Releasing** nav). Phase 3 Streamlit behavior unchanged from **v0.3.0**. See the [Changelog](https://luxin.readthedocs.io/en/latest/changelog/) (canonical copy also at [`CHANGELOG.md`](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md) in the repo).
 
 **Requirements**: **Streamlit >= 1.35** for dataframe row selection (`on_select` / `selection_mode`).
 
 ## 🗺️ Roadmap
 
-See [Roadmap](docs/roadmap.md) for the full picture. At a glance:
+See the [Roadmap](https://luxin.readthedocs.io/en/latest/roadmap/) for the full picture. At a glance:
 
 - **v0.3.0**: Phase 3 shipped — optional drill hierarchy, `luxin.compare`, quality dashboard, aggregation builder
 - **v0.4.0** (current packaging line): aligned PyPI packages, notebook HTML tests, CI/release hygiene (not the Phase 1 feature milestone)
@@ -244,7 +247,7 @@ See [Roadmap](docs/roadmap.md) for the full picture. At a glance:
 
 * **🐙 GitHub Repository**: https://github.com/eddiethedean/luxin
 * **📦 PyPI Package**: https://pypi.org/project/luxin/
-* **📚 Documentation**: https://luxin.readthedocs.io/
+* **📚 Documentation**: https://luxin.readthedocs.io/en/latest/
 * **🐛 Issues**: https://github.com/eddiethedean/luxin/issues
 
 ---
