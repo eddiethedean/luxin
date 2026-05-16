@@ -18,7 +18,7 @@ Luxin ships three coordinated packages from this repository:
 
 ## Tag and publish
 
-- Create and push an annotated git tag **`vX.Y.Z`** (for example `v0.4.0`). The release workflow validates versions against the tag.
+- Create and push an annotated git tag **`vX.Y.Z`** (for example `v0.4.1`). The release workflow validates versions against the tag.
 - Publishing is driven by `.github/workflows/release-pypi.yml` (see that workflow for exact gates).
 
 ## Local verification before tagging

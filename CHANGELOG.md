@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-05-16
+
+### Fixed
+
+- **Lint / mypy**: optional `children_by_parent_key` typing on `DrillHierarchySpec`; stable pagination hashing in `detail_panel` via `Series.to_numpy()` (CI `mypy`).
+
+### Documentation
+
+- **README**: Read the Docs as primary doc links (`/en/latest/`), RTD status badge, and PyPI-friendly absolute links for examples and LICENSE.
+- **PyPI metadata**: `Documentation` URL in `pyproject.toml` for `luxin`, `luxin-core`, and `luxin-nb`.
+
 ## [0.4.0] - 2026-05-15
 
 ### Changed

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 The canonical copy for GitHub and releases also lives at the repository root as [`CHANGELOG.md`](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md).
 
+## [0.4.1] - 2026-05-16
+
+**0.4.1** — mypy/CI typing fixes for drill hierarchy and detail panel hashing; README and PyPI **`Documentation`** URLs center **Read the Docs**. See root [`CHANGELOG.md`](../CHANGELOG.md) for bullets.
+
 ## [0.4.0] - 2026-05-15
 
 Coordinated **0.4.x** for `luxin`, `luxin-core`, and `luxin-nb`: monorepo alignment, **`luxin_nb`** HTML tests, release workflow **`__version__`** checks, NA-aware manual drill mapping and **`show_drill_table`** notebook fallback, expanded pytest suite (comparison, breadcrumbs, drill stack, aggregation builder, jupyter backend) with CI **`pytest-cov`** and **`cov-fail-under`**, and documentation/MkDocs updates (including **Releasing**). Canonical roots: **`luxin/`**, **`luxin_core/`**, **`luxin_nb/`**. See root [`CHANGELOG.md`](../CHANGELOG.md) for full bullets.

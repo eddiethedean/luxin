@@ -220,7 +220,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-**Releasing a version:** follow the [Releasing](https://luxin.readthedocs.io/en/latest/releasing/) guide. In short: align each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py`, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.0`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
+**Releasing a version:** follow the [Releasing](https://luxin.readthedocs.io/en/latest/releasing/) guide. In short: align each package’s `pyproject.toml` **`project.version`** and **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py`, update `CHANGELOG.md`, then create and push an annotated tag `vX.Y.Z` (for example `v0.4.1`). The tag must match those versions: the PyPI workflow checks `pyproject.toml` and `__version__` before publishing.
 
 ## 📄 License
 
@@ -228,7 +228,7 @@ This project is licensed under the MIT License — see the [LICENSE](https://git
 
 ## 📌 Current release
 
-**v0.4.0** — Coordinated **`luxin` / `luxin-core` / `luxin-nb`**; monorepo CI/release checks; fixes for **manual drill NA keys** and **`show_drill_table`** when Streamlit is missing; broader tests (incl. **`luxin_nb`** HTML and Streamlit-mocked UI) with a **combined coverage** gate in CI; docs refreshed (manual API, **Releasing** nav). Phase 3 Streamlit behavior unchanged from **v0.3.0**. See the [Changelog](https://luxin.readthedocs.io/en/latest/changelog/) (canonical copy also at [`CHANGELOG.md`](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md) in the repo).
+**v0.4.1** — **mypy**-clean `DrillHierarchySpec` / detail-panel hashing for CI; README and **PyPI** **`Documentation`** URLs emphasize **Read the Docs** (`/en/latest/`). See the [Changelog](https://luxin.readthedocs.io/en/latest/changelog/) (canonical copy also at [`CHANGELOG.md`](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md) in the repo).
 
 **Requirements**: **Streamlit >= 1.35** for dataframe row selection (`on_select` / `selection_mode`).
 
@@ -237,7 +237,7 @@ This project is licensed under the MIT License — see the [LICENSE](https://git
 See the [Roadmap](https://luxin.readthedocs.io/en/latest/roadmap/) for the full picture. At a glance:
 
 - **v0.3.0**: Phase 3 shipped — optional drill hierarchy, `luxin.compare`, quality dashboard, aggregation builder
-- **v0.4.0** (current packaging line): aligned PyPI packages, notebook HTML tests, CI/release hygiene (not the Phase 1 feature milestone)
+- **v0.4.x** (current packaging line): aligned PyPI packages, notebook HTML tests, CI/release hygiene (not the Phase 1 feature milestone)
 - **target v0.5.0**: Phase 1 core enhancements (charts, richer filters, performance, export)
 - **target v0.6.0**: Phase 2 data sources (SQL, cloud, APIs)
 - **target v0.7.0**: Phase 4 collaboration & sharing

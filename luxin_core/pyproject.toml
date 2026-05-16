@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "luxin-core"
-version = "0.4.0"
+version = "0.4.1"
 description = "Core logic for Luxin: tracked aggregations, drill specs, and dataframe helpers"
 requires-python = ">=3.8"
 dependencies = [

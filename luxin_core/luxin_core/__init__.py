@@ -13,7 +13,7 @@ from luxin_core.polars_support import (
 from luxin_core.tracked_df import TrackedDataFrame
 from luxin_core.utils import DetailIndexLabel, SourceMapping
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 __all__ = [
     "DetailIndexLabel",
     "DrillHierarchySpec",
