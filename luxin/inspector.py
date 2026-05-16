@@ -160,7 +160,10 @@ class Inspector:
                 and self.config.enable_multi_level_drill
             ):
                 render_drill_stack_view(
-                    cast(pd.DataFrame, effective_df), self.drill, config=self.config
+                    cast(pd.DataFrame, effective_df),
+                    self.drill,
+                    config=self.config,
+                    widget_key_suffix=suffix,
                 )
             else:
                 render_table_view(
@@ -169,6 +172,7 @@ class Inspector:
                     source_mapping=self._source_mapping,
                     groupby_cols=self._groupby_cols,
                     config=self.config,
+                    widget_key_suffix=suffix,
                 )
 
             if (

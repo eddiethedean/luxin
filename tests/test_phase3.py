@@ -22,6 +22,24 @@ from luxin.components.quality_indicators import (
 from luxin.utils import normalize_group_key
 
 
+def test_drill_children_by_parent_key_uses_normalized_lookup():
+    """Regression: precomputed children map uses O(1) normalized keys."""
+    child = (
+        TrackedDataFrame({"region": ["N"], "value": [1.0]})
+        .groupby("region")
+        .agg({"value": "mean"})
+    )
+
+    spec = DrillHierarchySpec(
+        session_key="t_lookup",
+        children_by_parent_key={("N",): child},
+    )
+    out = spec.resolve_child_for_parent_row(
+        ("N",), pd.DataFrame({"region": ["N"], "value": [1.0]})
+    )
+    assert out is child
+
+
 def test_drill_try_push_with_callback():
     base = TrackedDataFrame(
         {

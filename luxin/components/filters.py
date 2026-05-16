@@ -2,6 +2,7 @@
 Filtering component for aggregated data tables.
 """
 
+import math
 from typing import Any, List
 
 import pandas as pd
@@ -45,7 +46,11 @@ def render_filters(df: pd.DataFrame, key_prefix: str = "luxin_filter") -> pd.Dat
         # Align mask to df.index so text search works with non-RangeIndex frames
         mask = pd.Series(False, index=df.index)
         for col in df.columns:
-            mask |= df[col].astype(str).str.contains(search_text, case=False, na=False)
+            mask |= (
+                df[col]
+                .astype(str)
+                .str.contains(search_text, case=False, na=False, regex=False)
+            )
         filtered_df = filtered_df[mask]
 
     # Column-specific filters
@@ -68,7 +73,11 @@ def render_filters(df: pd.DataFrame, key_prefix: str = "luxin_filter") -> pd.Dat
                 # Numeric column - use range slider
                 col_min = float(df[col].min())
                 col_max = float(df[col].max())
-                if col_min < col_max:
+                if (
+                    col_min < col_max
+                    and math.isfinite(col_min)
+                    and math.isfinite(col_max)
+                ):
                     range_vals = st.slider(
                         f"Filter {col}",
                         min_value=col_min,

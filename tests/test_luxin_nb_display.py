@@ -35,9 +35,7 @@ def test_json_str_for_mapping_key_timestamp():
 
 
 def test_inject_data_luxin_keys_into_tbody():
-    table_html = (
-        "<table><tbody>" "<tr><td>a</td></tr>" "<tr><td>b</td></tr>" "</tbody></table>"
-    )
+    table_html = "<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>"
     out = _inject_data_luxin_keys_into_tbody(table_html, ["k1", "k2"])
     assert out.count("data-luxin-key=") == 2
     assert 'data-luxin-key="k1"' in out

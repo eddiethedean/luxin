@@ -45,6 +45,36 @@ def test_render_filters_text_search():
         assert result.iloc[0]["category"] == "Apple"
 
 
+def test_render_filters_text_search_treats_metacharacters_as_literal():
+    """Search must not interpret ``(``, ``*``, etc. as regex (no re.error)."""
+    df = pd.DataFrame({"category": ["Apple", "X(y", "Cherry"], "value": [10, 20, 30]})
+
+    with patch("luxin.components.filters.st") as mock_st:
+        mock_st.text_input = MagicMock(return_value="X(y")
+        mock_expander = MagicMock()
+        mock_st.expander = MagicMock(return_value=mock_expander)
+        mock_st.multiselect = MagicMock(return_value=[])
+        mock_st.slider = MagicMock(return_value=(10, 30))
+        mock_st.caption = MagicMock()
+
+        result = render_filters(df)
+
+    assert len(result) == 1
+    assert result.iloc[0]["category"] == "X(y"
+
+    with patch("luxin.components.filters.st") as mock_st:
+        mock_st.text_input = MagicMock(return_value="a(b")
+        mock_expander = MagicMock()
+        mock_st.expander = MagicMock(return_value=mock_expander)
+        mock_st.multiselect = MagicMock(return_value=[])
+        mock_st.slider = MagicMock(return_value=(10, 30))
+        mock_st.caption = MagicMock()
+
+        result = render_filters(df)
+
+    assert len(result) == 0
+
+
 def test_render_filters_text_search_non_range_index():
     """Text search must not crash when the frame uses a non-RangeIndex (index alignment)."""
     df = pd.DataFrame(

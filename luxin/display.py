@@ -12,6 +12,12 @@ _NOTEBOOK_INSTALL_HINT = (
 )
 
 
+_STREAMLIT_CONTEXT_HINT = (
+    "display_drill_table needs a supported environment: run inside `streamlit run`, "
+    "or in Jupyter/IPython with luxin[notebook] (or luxin-nb) installed."
+)
+
+
 def display_drill_table(
     agg_df: pd.DataFrame,
     detail_df: pd.DataFrame,
@@ -32,6 +38,9 @@ def display_drill_table(
 
         display_streamlit(agg_df, detail_df, source_mapping, groupby_cols, **kwargs)
         return
+
+    if env == "unknown":
+        raise ImportError(_STREAMLIT_CONTEXT_HINT)
 
     try:
         from luxin_nb.display import display_drill_table as display_notebook

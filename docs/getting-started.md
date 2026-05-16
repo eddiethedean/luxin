@@ -70,6 +70,8 @@ streamlit run app.py
 3. **Inspect** - Use `Inspector(agg_df).render()` to see the interactive view
 4. **Drill Down** - Select any aggregated row to see underlying detail data
 
+**Tip:** `Inspector` uses a stable widget key per instance so row selection and pagination survive Streamlit reruns. Recomputing `agg = df.groupby(...).agg(...)` on every run still works without losing selection; for very hot paths you can cache the aggregated frame with `st.cache_data` as usual.
+
 ## Next Steps
 
 - Read the [User Guide](user-guide.md), including Phase 3 optional features (v0.3.0+) and coordinated **`luxin` / `luxin-core` / `luxin-nb`** releases (**v0.4.x**)

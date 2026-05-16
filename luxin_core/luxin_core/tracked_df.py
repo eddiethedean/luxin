@@ -90,12 +90,13 @@ class TrackedDataFrame(pd.DataFrame):
 
         try:
             from luxin.inspector import Inspector
-
+        except ModuleNotFoundError as exc:
+            if getattr(exc, "name", "") not in ("luxin", "luxin.inspector", None):
+                raise
+        else:
             inspector = Inspector(self)
             inspector.render()
             return
-        except ImportError:
-            pass
 
         if self._source_df is None:
             raise ValueError(

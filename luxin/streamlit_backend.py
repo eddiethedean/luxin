@@ -3,7 +3,7 @@ Streamlit backend for displaying interactive drill-down tables.
 """
 
 import pandas as pd
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 
 def display_streamlit(
@@ -26,6 +26,8 @@ def display_streamlit(
         groupby_cols: List of column names used to group the data
         **kwargs: Forwarded into :class:`~luxin.config.InspectorConfig`; use ``config`` to pass an
                   instance explicitly. Unknown keys are ignored by ``InspectorConfig.from_dict``.
+                  Use ``widget_key_suffix`` for stable ``st.dataframe`` / filter widget keys across
+                  reruns (same value as :meth:`luxin.inspector.Inspector` session suffix).
     """
     try:
         import streamlit as st  # noqa: F401
@@ -40,6 +42,7 @@ def display_streamlit(
 
     kwargs_copy = dict(kwargs)
     config_obj = kwargs_copy.pop("config", None)
+    widget_key_suffix = kwargs_copy.pop("widget_key_suffix", None)
     if config_obj is None and kwargs_copy:
         config_obj = InspectorConfig.from_dict(kwargs_copy)
     if config_obj is None:
@@ -51,4 +54,5 @@ def display_streamlit(
         source_mapping,
         groupby_cols,
         config=config_obj,
+        widget_key_suffix=widget_key_suffix,
     )

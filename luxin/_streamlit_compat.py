@@ -5,21 +5,13 @@ from __future__ import annotations
 MIN_STREAMLIT_FOR_DATAFRAME_SELECTION = (1, 35, 0)
 
 
-def _parse_streamlit_version(version_str: str) -> tuple:
-    parts = []
-    for tok in version_str.split(".")[:3]:
-        digits = "".join(ch for ch in tok if ch.isdigit())
-        parts.append(int(digits) if digits else 0)
-    while len(parts) < 3:
-        parts.append(0)
-    return tuple(parts[:3])
-
-
 def streamlit_version_tuple() -> tuple:
-    """Return parsed (major, minor, patch) for the installed Streamlit."""
+    """Return parsed (major, minor, micro) for the installed Streamlit."""
     import streamlit as st  # noqa: PLC0415
+    from packaging.version import Version  # noqa: PLC0415
 
-    return _parse_streamlit_version(getattr(st, "__version__", "0"))
+    v = Version(getattr(st, "__version__", "0"))
+    return (v.major, v.minor, v.micro)
 
 
 def dataframe_selection_supported() -> bool:

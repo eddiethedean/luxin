@@ -4,9 +4,11 @@ from unittest.mock import MagicMock, patch
 
 import sys
 
+import pytest
+
 import pandas as pd
 
-from luxin.display import _detect_environment, render_html
+from luxin.display import _detect_environment, display_drill_table, render_html
 
 
 def test_detect_environment():
@@ -41,6 +43,19 @@ def test_detect_environment_unknown_without_ctx_or_ipython():
             "streamlit.runtime.scriptrunner.get_script_run_ctx", return_value=None
         ):
             assert _detect_environment() == "unknown"
+
+
+def test_display_drill_table_unknown_environment_message():
+    """Plain Python / unknown env should not claim only the notebook extra is missing."""
+    agg = pd.DataFrame({"v": [1]})
+    with patch("luxin.display._detect_environment", return_value="unknown"):
+        with pytest.raises(ImportError, match="supported environment"):
+            display_drill_table(
+                agg,
+                agg,
+                {(): [0]},
+                [],
+            )
 
 
 def test_render_html_basic():

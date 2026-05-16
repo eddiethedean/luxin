@@ -69,7 +69,8 @@ class DrillHierarchySpec:
     Declarative spec for advancing from a parent aggregated row into a child aggregation.
 
     Either provide ``next_level`` callable or ``children_by_parent_key`` lookup of
-    precomputed ``TrackedDataFrame`` keyed by normalized parent tuples.
+    precomputed ``TrackedDataFrame``. Map keys are normalized to canonical tuple keys
+    at construction (see :func:`luxin_core.utils.normalize_group_key`).
     """
 
     def __init__(
@@ -85,9 +86,12 @@ class DrillHierarchySpec:
         self.max_depth = int(max_depth)
         self.level_labels = list(level_labels) if level_labels is not None else None
         self.next_level = next_level
-        self.children_by_parent_key = (
-            dict(children_by_parent_key) if children_by_parent_key else None
-        )
+        if children_by_parent_key:
+            self.children_by_parent_key = {
+                normalize_group_key(k): v for k, v in children_by_parent_key.items()
+            }
+        else:
+            self.children_by_parent_key = None
 
         if self.next_level is None and self.children_by_parent_key is None:
             raise ValueError(
@@ -104,11 +108,7 @@ class DrillHierarchySpec:
     ) -> Optional[Any]:
         nk = normalize_group_key(parent_normalized_key)
         if self.children_by_parent_key is not None:
-            cand = None
-            for k, df in self.children_by_parent_key.items():
-                if normalize_group_key(k) == nk:
-                    cand = df
-                    break
+            cand = self.children_by_parent_key.get(nk)
             if cand is not None:
                 return _as_tracked_from_context(cand)
         if self.next_level is None:

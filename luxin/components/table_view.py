@@ -114,6 +114,8 @@ def render_drill_stack_view(
     root_tracked_agg: Any,
     spec: DrillHierarchySpec,
     config: Optional[InspectorConfig] = None,
+    *,
+    widget_key_suffix: Optional[str] = None,
 ) -> None:
     """
     Multi-level drill: breadcrumb stack + aggregated table at current depth + detail panel.
@@ -148,11 +150,19 @@ def render_drill_stack_view(
     display_df = _align_display_index_columns(display_df, agg_df, groupby_cols)
 
     if config.show_filters:
-        filter_key = f"luxin_filter_drill_{spec.session_key}_{len(stack)}"
+        if widget_key_suffix:
+            filter_key = f"luxin_filter_drill_{widget_key_suffix}_{spec.session_key}_{len(stack)}"
+        else:
+            filter_key = f"luxin_filter_drill_{spec.session_key}_{len(stack)}"
         display_df = render_filters(display_df, key_prefix=filter_key)
 
     if len(display_df) > 0:
-        widget_table_key = f"luxin_table_{spec.session_key}_{len(stack)}"
+        if widget_key_suffix:
+            widget_table_key = (
+                f"luxin_table_{widget_key_suffix}_{spec.session_key}_{len(stack)}"
+            )
+        else:
+            widget_table_key = f"luxin_table_{spec.session_key}_{len(stack)}"
         col1, col2 = st.columns([2, 1])
         with col1:
             selected_rows = st.dataframe(
@@ -237,6 +247,8 @@ def render_table_view(
     source_mapping: Dict[Any, List[int]],
     groupby_cols: List[str],
     config: Optional[InspectorConfig] = None,
+    *,
+    widget_key_suffix: Optional[str] = None,
 ) -> None:
     """
     Render the main table view with drill-down capabilities.
@@ -272,13 +284,21 @@ def render_table_view(
 
     # Apply filters if enabled
     if config.show_filters:
-        filter_key = f"luxin_filter_{id(agg_df)}"
+        filter_key = (
+            f"luxin_filter_{widget_key_suffix}"
+            if widget_key_suffix
+            else f"luxin_filter_{id(agg_df)}"
+        )
         display_df = render_filters(display_df, key_prefix=filter_key)
 
     # Use clickable table rows with st.dataframe selection
     if len(display_df) > 0:
         # Create two columns: main table and detail panel
-        table_key = f"luxin_table_{id(agg_df)}"
+        table_key = (
+            f"luxin_table_{widget_key_suffix}"
+            if widget_key_suffix
+            else f"luxin_table_{id(agg_df)}"
+        )
         col1, col2 = st.columns([2, 1])
 
         with col1:
