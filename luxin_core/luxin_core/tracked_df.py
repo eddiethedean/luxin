@@ -8,6 +8,22 @@ from typing import Any, Dict, List, Optional, cast
 from luxin_core.utils import DetailIndexLabel
 
 
+def _inspector_import_should_fall_through(exc: BaseException) -> bool:
+    """
+    Returns True when ``from luxin.inspector import Inspector`` failed only because an
+    optional dependency (``luxin`` / ``streamlit``) is missing, so ``show_drill_table``
+    can try the Jupyter/HTML path via ``luxin_nb``.
+    """
+    if not isinstance(exc, ModuleNotFoundError):
+        return False
+    name = getattr(exc, "name", None)
+    if name in (None, "luxin", "luxin.inspector"):
+        return True
+    if name == "streamlit" or (isinstance(name, str) and name.startswith("streamlit.")):
+        return True
+    return False
+
+
 def _normalize_groupby_columns(by) -> List[str]:
     """
     Normalize ``pandas.DataFrame.groupby(by=...)`` column arguments for tracked groupby.
@@ -99,7 +115,7 @@ class TrackedDataFrame(pd.DataFrame):
         try:
             from luxin.inspector import Inspector
         except ModuleNotFoundError as exc:
-            if getattr(exc, "name", "") not in ("luxin", "luxin.inspector", None):
+            if not _inspector_import_should_fall_through(exc):
                 raise
         else:
             inspector = Inspector(self)

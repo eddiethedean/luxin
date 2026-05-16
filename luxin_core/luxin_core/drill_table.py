@@ -13,6 +13,20 @@ from luxin_core.validation import (
 from luxin_core.utils import DetailIndexLabel, finalize_source_mapping, SourceMapping
 
 
+def _series_na_safe_equals(series: pd.Series, val) -> pd.Series:
+    """
+    Element-wise equality suitable for building detail masks, with NA == NA as True.
+
+    Plain ``series == val`` is False for NaN/NaT/pd.NA on both sides; groupby keys from
+    ``dropna=False`` need NA-aware matching.
+    """
+    raw_eq = series == val
+    if isinstance(raw_eq, pd.Series):
+        raw_eq = raw_eq.fillna(False)
+    both_na = series.isna() & pd.isna(val)
+    return raw_eq | both_na
+
+
 def build_manual_source_mapping(
     agg_df: pd.DataFrame, detail_df: pd.DataFrame, groupby_cols: List[str]
 ) -> SourceMapping:
@@ -36,10 +50,10 @@ def build_manual_source_mapping(
             # idx is already a tuple
             group_key = idx
 
-            # Build filter condition
-            mask = pd.Series([True] * len(detail_df))
+            # Build filter condition (index-aligned; NA-aware for dropna=False keys)
+            mask = pd.Series(True, index=detail_df.index)
             for col, val in zip(groupby_cols, group_key):
-                mask &= detail_df[col] == val
+                mask &= _series_na_safe_equals(detail_df[col], val)
 
             # Get matching indices
             matching_indices = detail_df[mask].index.tolist()
@@ -49,8 +63,7 @@ def build_manual_source_mapping(
         for idx in agg_df.index:
             group_key = (idx,)
 
-            # Build filter condition
-            mask = detail_df[groupby_cols[0]] == idx
+            mask = _series_na_safe_equals(detail_df[groupby_cols[0]], idx)
 
             # Get matching indices
             matching_indices = detail_df[mask].index.tolist()
