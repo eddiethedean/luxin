@@ -18,7 +18,7 @@ def _fallback_pagination_session_key(detail_rows: pd.DataFrame) -> str:
     h.update(str(list(detail_rows.columns)).encode())
     h.update(str(len(detail_rows)).encode())
     if len(detail_rows) > 0:
-        h.update(hash_pandas_object(detail_rows, index=True).values.tobytes())
+        h.update(hash_pandas_object(detail_rows, index=True).to_numpy().tobytes())
     return f"detail_page_{h.hexdigest()[:24]}"
 
 

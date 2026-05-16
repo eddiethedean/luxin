@@ -86,6 +86,7 @@ class DrillHierarchySpec:
         self.max_depth = int(max_depth)
         self.level_labels = list(level_labels) if level_labels is not None else None
         self.next_level = next_level
+        self.children_by_parent_key: Optional[DrillLookup]
         if children_by_parent_key:
             self.children_by_parent_key = {
                 normalize_group_key(k): v for k, v in children_by_parent_key.items()
