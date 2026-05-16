@@ -225,7 +225,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📌 Current release
 
-**v0.4.0** — Coordinated **`luxin` / `luxin-core` / `luxin-nb`** releases, expanded **`luxin_nb`** test coverage, repository cleanup, and stricter release checks; user-visible Phase 3 behavior unchanged from **v0.3.0**. See [CHANGELOG.md](CHANGELOG.md).
+**v0.4.0** — Coordinated **`luxin` / `luxin-core` / `luxin-nb`**; monorepo CI/release checks; fixes for **manual drill NA keys** and **`show_drill_table`** when Streamlit is missing; broader tests (incl. **`luxin_nb`** HTML and Streamlit-mocked UI) with a **combined coverage** gate in CI; docs refreshed (manual API, **Releasing** nav). Phase 3 Streamlit behavior unchanged from **v0.3.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 **Requirements**: **Streamlit >= 1.35** for dataframe row selection (`on_select` / `selection_mode`).
 

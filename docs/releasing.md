@@ -13,7 +13,8 @@ Luxin ships three coordinated packages from this repository:
 1. Set **`project.version`** in each `pyproject.toml` (`./pyproject.toml`, `luxin_core/pyproject.toml`, `luxin_nb/pyproject.toml`) to the same **X.Y.Z**.
 2. Set **`__version__`** in `luxin/__init__.py`, `luxin_core/luxin_core/__init__.py`, and `luxin_nb/luxin_nb/__init__.py` to match.
 3. Ensure root `pyproject.toml` dependency **`luxin-core>=X.Y.Z,<next_minor`** matches the core package version line you are releasing.
-4. Update **`CHANGELOG.md`** with user-facing notes for this release.
+4. Update **`CHANGELOG.md`** and mirror a short summary at the top of **`docs/changelog.md`** for the same version (no stray **`[Unreleased]`** section with changes meant for this tag).
+5. Confirm **`luxin_nb/pyproject.toml`** still pins **`luxin-core>=X.Y.Z,<next_minor`** in sync with core.
 
 ## Tag and publish
 
@@ -30,4 +31,5 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v -p pytest_cov \
 ruff check luxin/ luxin_core/ luxin_nb/ tests/
 black --check luxin/ luxin_core/ luxin_nb/ tests/
 mypy luxin/ luxin_core/luxin_core/ luxin_nb/luxin_nb/ --ignore-missing-imports
+ty check
 ```

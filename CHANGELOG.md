@@ -5,21 +5,6 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Fixed
-
-- **Manual source mapping** (`build_manual_source_mapping` / `create_drill_table`): match detail rows when aggregate group keys contain missing values (`NaN`, `NaT`, `pd.NA`) with `groupby(..., dropna=False)`; build filters with index-aligned boolean masks.
-- **`TrackedDataFrame.show_drill_table`**: when importing `luxin.inspector` fails with `ModuleNotFoundError` for **`streamlit`** or a **`streamlit.*`** submodule, fall through to the **`luxin_nb`** / Jupyter path instead of re-raising.
-
-### Added
-
-- **Tests**: NA group keys for manual mapping (`tests/test_drill_table.py`); `show_drill_table` import fallback (`tests/test_show_drill_streamlit_fallback.py`).
-
-### Documentation
-
-- User guide, API reference, troubleshooting, migration, and examples updated for manual drill NA behavior, `show_drill_table` / notebook fallback, and accurate `create_drill_table` status; Read the Docs nav includes **Releasing**.
-
 ## [0.4.0] - 2026-05-15
 
 ### Changed
@@ -29,15 +14,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Tests**: unit coverage for **`luxin_nb`** HTML drill-down (`render_html`, row key injection, embedded source-mapping JSON).
+- **Tests**: NA group keys for manual mapping; `show_drill_table` import fallback when Streamlit is unavailable (`tests/test_show_drill_streamlit_fallback.py`).
+- **Tests**: shared `tests/conftest.py` fixtures, pytest **`--strict-markers`**, and Streamlit-mocked coverage for comparison UI, breadcrumbs, multi-level drill stack view, aggregation builder, and **`luxin_nb.jupyter_backend`**.
+- **CI**: combined coverage for `luxin`, `luxin_core`, and `luxin_nb` with **`pytest -p pytest_cov`** (required when **`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`**) and **`--cov-fail-under`**.
 
 ### Fixed
 
 - **Release CI**: verify each package’s **`__version__`** matches the git tag, not only `pyproject.toml`.
 - **CI**: `pytest` runs with **`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`** (matches local development docs).
+- **Manual source mapping** (`build_manual_source_mapping` / `create_drill_table`): match detail rows when aggregate group keys contain missing values (`NaN`, `NaT`, `pd.NA`) with `groupby(..., dropna=False)`; use index-aligned boolean masks.
+- **`TrackedDataFrame.show_drill_table`**: when importing `luxin.inspector` fails with `ModuleNotFoundError` for **`streamlit`** or a **`streamlit.*`** submodule, fall through to the **`luxin_nb`** / Jupyter path instead of re-raising.
 
 ### Documentation
 
 - README and roadmap: **v0.4.0** as current coordinated release; Phase 1 onward targets bumped (see [Roadmap](docs/roadmap.md)).
+- User guide, API reference, troubleshooting, migration, and examples updated for manual drill NA behavior, `show_drill_table` / notebook fallback, accurate **`create_drill_table`** status, and Read the Docs **Releasing** nav; local **MkDocs** build output **`site/`** gitignored.
+- README and **releasing.md**: testing and coverage commands aligned with CI.
 
 ## [0.3.0] - 2026-05-15
 
