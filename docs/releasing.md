@@ -25,7 +25,8 @@ Luxin ships three coordinated packages from this repository:
 
 ```bash
 pip install -e ./luxin_core -e ./luxin_nb -e ".[dev,polars]"
-pip install "streamlit>=1.35.0"
+pip install -r docs/requirements.txt "streamlit>=1.35.0"
+NO_MKDOCS_2_WARNING=1 mkdocs build --strict
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v -p pytest_cov \
   --cov=luxin --cov=luxin_core --cov=luxin_nb --cov-report=term --cov-fail-under=79
 ruff check luxin/ luxin_core/ luxin_nb/ tests/
@@ -33,3 +34,5 @@ black --check luxin/ luxin_core/ luxin_nb/ tests/
 mypy luxin/ luxin_core/luxin_core/ luxin_nb/luxin_nb/ --ignore-missing-imports
 ty check
 ```
+
+`NO_MKDOCS_2_WARNING=1` silences a Material for MkDocs notice about a future **MkDocs 2.0** fork so **`mkdocs build --strict`** only reports real doc issues. Output is written to the `site/` directory (gitignored).

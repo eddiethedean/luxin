@@ -198,7 +198,7 @@ Fetch data from REST APIs and GraphQL endpoints.
 
 ### Phase 3: Advanced Features — **shipped in v0.3.0**
 
-**Released**: 2026 (see [CHANGELOG](../CHANGELOG.md)).  
+**Released**: 2026 (see [CHANGELOG](https://github.com/eddiethedean/luxin/blob/master/CHANGELOG.md)).  
 **Priority** (original plan): Medium  
 **Effort** (original plan): High
 

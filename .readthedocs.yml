@@ -4,6 +4,11 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
+  jobs:
+    build:
+      html:
+        # Suppress Material’s MkDocs 2.0 advisory banner on stderr; --strict fails on broken internal links.
+        - NO_MKDOCS_2_WARNING=1 mkdocs build --strict -f mkdocs.yml --site-dir $READTHEDOCS_OUTPUT/html
 
 mkdocs:
   configuration: mkdocs.yml
